@@ -1,6 +1,7 @@
 import { supabase } from "./supabase";
 import { profilIdSesi } from "./session";
 import { biayaPerSlot, hargaRupiah, type Batch, type Komponen, type Negara, type Pesanan, type Profil, type Review, type StatusPesanan, type StatusTracking, type ItemBatch } from "./data";
+import { batchCadangan, negaraCadangan, komponenCadangan, pesananCadangan, reviewCadangan } from "./katalog-cadangan";
 
 export interface BatchLengkap {
   batch: Batch;
@@ -109,44 +110,7 @@ async function ambil<T>(tabel: string): Promise<T[]> {
   return (data ?? []) as T[];
 }
 
-export async function muatKatalog(): Promise<Katalog> {
-  const [negaraRows, komponenRows, batchRows, itemRows, trackingRows] = await Promise.all([
-    ambil<BarisNegara>("countries"),
-    ambil<BarisKomponen>("components"),
-    ambil<BarisBatch>("batches"),
-    ambil<BarisItem>("batch_items"),
-    ambil<BarisTracking>("tracking_updates"),
-  ]);
-
-  const negaraList: Negara[] = negaraRows
-    .sort((a, b) => a.urutan - b.urutan)
-    .map((r) => ({ kode: r.kode, nama: r.nama, mataUang: r.mata_uang as Negara["mataUang"] }));
-  const komponenList: Komponen[] = komponenRows
-    .sort((a, b) => a.urutan - b.urutan)
-    .map((r) => ({ id: r.id, negara: r.country_kode, nama: r.nama, deskripsi: r.deskripsi ?? "" }));
-  const batchList: Batch[] = batchRows.map((r) => ({
-    id: r.id,
-    komponenId: r.component_id,
-    nama: r.nama,
-    slug: r.slug,
-    bukaPo: r.buka_po,
-    tutupPo: r.tutup_po,
-    kursGo: Number(r.kurs_go),
-    ongkirLokal: r.ongkir_lokal,
-    ongkirInternasional: r.ongkir_internasional,
-    feeOrganizer: r.fee_organizer,
-    status: r.status as Batch["status"],
-    catatan: r.catatan ?? undefined,
-    items: itemRows
-      .filter((i) => i.batch_id === r.id)
-      .sort((a, b) => a.urutan - b.urutan)
-      .map((i) => ({ id: i.id, nama: i.nama, hargaLokal: Number(i.harga_lokal), kuota: i.kuota, terisi: i.terisi })),
-    tracking: trackingRows
-      .filter((t) => t.batch_id === r.id)
-      .sort((a, b) => a.tanggal.localeCompare(b.tanggal))
-      .map((t) => ({ status: t.status as StatusTracking, catatan: t.catatan ?? "", tanggal: t.tanggal })),
-  }));
-
+function rangkaiKatalog(negaraList: Negara[], komponenList: Komponen[], batchList: Batch[]): Katalog {
   const komponenById = new Map(komponenList.map((k) => [k.id, k]));
   const negaraByKode = new Map(negaraList.map((n) => [n.kode, n]));
 
@@ -171,6 +135,54 @@ export async function muatKatalog(): Promise<Katalog> {
   };
 }
 
+export async function muatKatalog(): Promise<Katalog> {
+  try {
+    const [negaraRows, komponenRows, batchRows, itemRows, trackingRows] = await Promise.all([
+      ambil<BarisNegara>("countries"),
+      ambil<BarisKomponen>("components"),
+      ambil<BarisBatch>("batches"),
+      ambil<BarisItem>("batch_items"),
+      ambil<BarisTracking>("tracking_updates"),
+    ]);
+
+    const negaraList: Negara[] = negaraRows
+      .sort((a, b) => a.urutan - b.urutan)
+      .map((r) => ({ kode: r.kode, nama: r.nama, mataUang: r.mata_uang as Negara["mataUang"] }));
+    const komponenList: Komponen[] = komponenRows
+      .sort((a, b) => a.urutan - b.urutan)
+      .map((r) => ({ id: r.id, negara: r.country_kode, nama: r.nama, deskripsi: r.deskripsi ?? "" }));
+    const batchList: Batch[] = batchRows.map((r) => ({
+      id: r.id,
+      komponenId: r.component_id,
+      nama: r.nama,
+      slug: r.slug,
+      bukaPo: r.buka_po,
+      tutupPo: r.tutup_po,
+      kursGo: Number(r.kurs_go),
+      ongkirLokal: r.ongkir_lokal,
+      ongkirInternasional: r.ongkir_internasional,
+      feeOrganizer: r.fee_organizer,
+      status: r.status as Batch["status"],
+      catatan: r.catatan ?? undefined,
+      items: itemRows
+        .filter((i) => i.batch_id === r.id)
+        .sort((a, b) => a.urutan - b.urutan)
+        .map((i) => ({ id: i.id, nama: i.nama, hargaLokal: Number(i.harga_lokal), kuota: i.kuota, terisi: i.terisi })),
+      tracking: trackingRows
+        .filter((t) => t.batch_id === r.id)
+        .sort((a, b) => a.tanggal.localeCompare(b.tanggal))
+        .map((t) => ({ status: t.status as StatusTracking, catatan: t.catatan ?? "", tanggal: t.tanggal })),
+    }));
+
+    return rangkaiKatalog(negaraList, komponenList, batchList);
+  } catch (galatAsli) {
+    // Supabase gagal dihubungi: tampilkan katalog contoh supaya halaman
+    // publik tetap utuh. Bukan kondisi normal; perbaiki koneksi di .env.local.
+    console.error("Supabase tidak terjangkau, memakai katalog cadangan:", galatAsli instanceof Error ? galatAsli.message : galatAsli);
+    return rangkaiKatalog(negaraCadangan, komponenCadangan, batchCadangan);
+  }
+}
+
 export async function batchLengkapBySlug(slug: string): Promise<BatchLengkap | undefined> {
   const katalog = await muatKatalog();
   const batch = katalog.batchList.find((b) => b.slug === slug);
@@ -178,15 +190,19 @@ export async function batchLengkapBySlug(slug: string): Promise<BatchLengkap | u
 }
 
 export async function reviewTampil(batchId: string): Promise<Review[]> {
-  const { data, error } = await supabase()
-    .from("reviews")
-    .select("*")
-    .eq("batch_id", batchId)
-    .eq("tampil", true);
-  if (error) throw new Error(`Gagal membaca review: ${error.message}`);
-  return ((data ?? []) as BarisReview[])
-    .map((r) => ({ id: r.id, batchId: r.batch_id, nama: r.nama, tanggal: r.tanggal, bintang: r.bintang, teks: r.teks }))
-    .sort((a, b) => b.tanggal.localeCompare(a.tanggal));
+  try {
+    const { data, error } = await supabase()
+      .from("reviews")
+      .select("*")
+      .eq("batch_id", batchId)
+      .eq("tampil", true);
+    if (error) throw new Error(`Gagal membaca review: ${error.message}`);
+    return ((data ?? []) as BarisReview[])
+      .map((r) => ({ id: r.id, batchId: r.batch_id, nama: r.nama, tanggal: r.tanggal, bintang: r.bintang, teks: r.teks }))
+      .sort((a, b) => b.tanggal.localeCompare(a.tanggal));
+  } catch {
+    return reviewCadangan.filter((r) => r.batchId === batchId);
+  }
 }
 
 export async function semuaReview(): Promise<(Review & { tampil: boolean })[]> {
@@ -285,20 +301,29 @@ export async function pesananProfil(profileId: string): Promise<Pesanan[]> {
 }
 
 export async function pesananByKodeDb(kode: string): Promise<Pesanan | undefined> {
-  const { data, error } = await supabase().from("orders").select("*").eq("kode", kode.trim()).maybeSingle();
-  if (error) throw new Error(`Gagal mencari pesanan: ${error.message}`);
-  if (!data) return undefined;
-  const [hasil] = await susunPesanan([data as BarisOrder]);
-  return hasil;
+  try {
+    const { data, error } = await supabase().from("orders").select("*").eq("kode", kode.trim()).maybeSingle();
+    if (error) throw new Error(`Gagal mencari pesanan: ${error.message}`);
+    if (!data) return undefined;
+    const [hasil] = await susunPesanan([data as BarisOrder]);
+    return hasil;
+  } catch {
+    return pesananCadangan.find((p) => p.kode.toLowerCase() === kode.trim().toLowerCase());
+  }
 }
 
 export async function pesananByUsernameDb(username: string): Promise<Pesanan[]> {
-  const { data, error } = await supabase()
-    .from("orders")
-    .select("*")
-    .ilike("buyer_username", username.trim());
-  if (error) throw new Error(`Gagal mencari pesanan: ${error.message}`);
-  return susunPesanan((data ?? []) as BarisOrder[]);
+  try {
+    const { data, error } = await supabase()
+      .from("orders")
+      .select("*")
+      .ilike("buyer_username", username.trim());
+    if (error) throw new Error(`Gagal mencari pesanan: ${error.message}`);
+    return susunPesanan((data ?? []) as BarisOrder[]);
+  } catch {
+    const q = username.trim().toLowerCase();
+    return pesananCadangan.filter((p) => p.buyerLabel.toLowerCase() === q);
+  }
 }
 
 export async function semuaPesanan(): Promise<Pesanan[]> {

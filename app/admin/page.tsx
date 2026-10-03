@@ -36,12 +36,25 @@ export default async function HalamanAdmin({ searchParams }: { searchParams: Pro
   const params = await searchParams;
   const pesanKunci = Object.keys(PESAN).find((k) => params[k.split("=")[0]] === k.split("=")[1]);
 
-  const [katalog, pesanan, profilList, reviewList] = await Promise.all([
-    muatKatalog(),
-    semuaPesanan(),
-    semuaProfil(),
-    semuaReview(),
-  ]);
+  let katalog, pesanan, profilList, reviewList;
+  try {
+    [katalog, pesanan, profilList, reviewList] = await Promise.all([
+      muatKatalog(),
+      semuaPesanan(),
+      semuaProfil(),
+      semuaReview(),
+    ]);
+  } catch {
+    return (
+      <div className="wadah">
+        <h1>Panel Admin</h1>
+        <p className="kosong">
+          Database belum tersambung, jadi panel belum bisa menampilkan data. Perbaiki `SUPABASE_URL` di `.env.local`
+          lalu muat ulang halaman.
+        </p>
+      </div>
+    );
+  }
   const batchNama = new Map(katalog.batchList.map((b) => [b.id, b.nama]));
 
   return (

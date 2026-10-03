@@ -58,8 +58,7 @@ Status tracking batch (urut, konsisten, dipakai di seluruh UI):
 ### Fase 2: database Supabase, login LINE, tagihan (disiapkan, lihat `docs/PANDUAN-FASE2.md`)
 
 - Data pindah dari `lib/data.ts` ke Supabase (Postgres). Skema siap di `supabase/schema.sql`. Update data lewat Supabase Table Editor (rasanya seperti spreadsheet) dan panel admin.
-- **Login LINE**: buyer masuk pakai akun LINE (OAuth LINE Login, gratis), identitas tersimpan di tabel `profiles`. Kunci yang harus disiapkan organizer: project Supabase + channel LINE Login (panduan lengkap di `docs/PANDUAN-FASE2.md`).
-- **Katalog terbatas untuk member** (keputusan organizer): halaman PO & Batch, detail batch, dan Tracking hanya untuk yang sudah login LINE; kalau dipencet sebelum login dialihkan ke halaman masuk, dan setelah login langsung diteruskan ke halaman tujuan. Beranda, kalkulator, dan Cek Pesanan tetap publik.
+- **Login LINE**: buyer masuk pakai akun LINE (OAuth LINE Login, gratis), identitas tersimpan di tabel `profiles`. Kunci yang harus disiapkan organizer: project Supabase + channel LINE Login (panduan lengkap di `docs/PANDUAN-FASE2.md`). Semua halaman katalog (beranda, PO & Batch, Tracking) tetap publik tanpa login; login LINE opsional, dipakai buat halaman Tagihan dan pesanan yang nempel ke akun buyer.
 - **Halaman Tagihan** untuk buyer yang login: tagihan belum dibayar, menunggu verifikasi, riwayat lunas, semuanya nempel ke akun LINE mereka. Tanpa fitur coin, sesuai keputusan organizer.
 - Form order di web + upload bukti transfer; pembayaran pakai QRIS statis, verifikasi manual oleh admin dari panel.
 - Admin panel sederhana: kelola batch/item, update tracking, bikin tagihan, centang bukti bayar lunas, kelola review yang tampil.
