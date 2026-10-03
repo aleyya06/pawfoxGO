@@ -29,7 +29,7 @@ export default async function Beranda() {
     return <GalatDb />;
   }
 
-  const poAktif = katalog.batchList.filter((b) => b.status === "po_dibuka");
+  const poAktif = katalog.batchList.filter((b) => b.status === "open");
   const reviews = await semuaReviewTampil();
   const jumlahBatchNegara = (kode: string) =>
     katalog.batchList.filter((b) => katalog.komponenList.find((k) => k.id === b.komponenId)?.negara === kode).length;

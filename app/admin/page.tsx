@@ -200,7 +200,7 @@ export default async function HalamanAdmin({ searchParams }: { searchParams: Pro
           </label>
           <label>
             Status baru
-            <select name="status" required defaultValue="po_dibuka">
+            <select name="status" required defaultValue="open">
               {STATUS_TRACKING.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.label}

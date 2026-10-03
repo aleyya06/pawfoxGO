@@ -2,11 +2,10 @@ import { labelStatus, type StatusTracking } from "@/lib/data";
 
 function nada(status: StatusTracking): string {
   switch (status) {
-    case "po_dibuka":
-    case "otw_indonesia":
+    case "open":
+    case "arrived_indonesia":
       return "badge-orange";
-    case "siap_dikirim":
-    case "selesai":
+    case "arrived_admin":
       return "badge-blush";
     default:
       return "badge-netral";
