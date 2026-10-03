@@ -257,7 +257,7 @@ export default async function HalamanAdmin({ searchParams }: { searchParams: Pro
         menyusul.
       </p>
       <p className="po-kartu-meta">
-        <Link href="/tagihan">Kembali ke halaman tagihanku</Link>
+        <Link href="/profil">Kembali ke profilkamu</Link>
       </p>
     </div>
   );

@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
 
     const lanjutCookie = req.cookies.get("pawfox_lanjut")?.value;
     const lanjut = lanjutCookie && lanjutCookie.startsWith("/") && !lanjutCookie.startsWith("//") ? lanjutCookie : null;
-    const tujuan = jadiAdmin && !lanjut ? "/admin?selamat=1" : (lanjut ?? "/tagihan");
+    const tujuan = jadiAdmin && !lanjut ? "/admin?selamat=1" : (lanjut ?? "/profil");
     const res = NextResponse.redirect(new URL(tujuan, req.url));
     res.cookies.delete("pawfox_state");
     res.cookies.delete("pawfox_lanjut");
