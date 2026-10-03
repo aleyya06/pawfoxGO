@@ -13,7 +13,11 @@ export function supabase(): SupabaseClient {
         "SUPABASE_URL / SUPABASE_SECRET_KEY belum terisi dengan benar di .env.local (URL harus bentuk https://xxxx.supabase.co)"
       );
     }
-    klien = createClient(url, kunci, { auth: { persistSession: false } });
+    // DNS atau jaringan bermasalah tidak boleh menggantung halaman: setiap
+    // permintaan dipotong di 5 detik, fallback katalog yang lanjut.
+    const fetchBatasWaktu: typeof fetch = (input, init) =>
+      fetch(input, { ...init, signal: AbortSignal.timeout(5000) });
+    klien = createClient(url, kunci, { auth: { persistSession: false }, global: { fetch: fetchBatasWaktu } });
   }
   return klien;
 }

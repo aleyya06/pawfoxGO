@@ -22,7 +22,7 @@ const PESAN: Record<string, string> = {
 };
 
 export default async function HalamanAdmin({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
-  const sesi = await profilSesi();
+  const sesi = await profilSesi().catch(() => null);
   if (!sesi) redirect("/masuk");
   if (!sesi.isAdmin) {
     return (

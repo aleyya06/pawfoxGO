@@ -104,7 +104,15 @@ interface BarisOrderItem {
   harga_satuan_rp: number;
 }
 
+// Pemutus sirkuit: kalau Supabase baru saja gagal, jangan coba lagi selama
+// satu menit, langsung pakai cadangan supaya halaman tetap cepat.
+let gagalSampai = 0;
+const JEDA_GAGAL_MS = 10 * 60_000;
+
 async function ambil<T>(tabel: string): Promise<T[]> {
+  if (Date.now() < gagalSampai) {
+    throw new Error("Supabase baru saja gagal dihubungi, sementara memakai data cadangan");
+  }
   const { data, error } = await supabase().from(tabel).select("*");
   if (error) throw new Error(`Gagal membaca tabel ${tabel}: ${error.message}`);
   return (data ?? []) as T[];
@@ -178,6 +186,7 @@ export async function muatKatalog(): Promise<Katalog> {
   } catch (galatAsli) {
     // Supabase gagal dihubungi: tampilkan katalog contoh supaya halaman
     // publik tetap utuh. Bukan kondisi normal; perbaiki koneksi di .env.local.
+    gagalSampai = Date.now() + JEDA_GAGAL_MS;
     console.error("Supabase tidak terjangkau, memakai katalog cadangan:", galatAsli instanceof Error ? galatAsli.message : galatAsli);
     return rangkaiKatalog(negaraCadangan, komponenCadangan, batchCadangan);
   }

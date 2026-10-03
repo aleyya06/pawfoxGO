@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Countdown from "@/components/Countdown";
 import KalkulatorKurs from "@/components/KalkulatorKurs";
+import PawIkon from "@/components/PawIkon";
 import StatusBadge from "@/components/StatusBadge";
 import { KONTAK } from "@/lib/data";
 import { formatRupiah } from "@/lib/format";
@@ -114,7 +115,10 @@ export default async function Beranda() {
               <Link key={n.kode} href={`/po#negara-${n.kode}`} className="kartu negara-kartu">
                 <h3>{n.nama}</h3>
                 <p className="po-kartu-meta">Mata uang: {n.mataUang}</p>
-                <p className="po-kartu-meta">{jumlah > 0 ? `${jumlah} batch` : "Belum ada batch"}</p>
+                <p className="po-kartu-meta negara-jumlah">
+                  <PawIkon className="paw-kecil" />
+                  {jumlah > 0 ? `${jumlah} batch` : "Belum ada batch"}
+                </p>
               </Link>
             );
           })}

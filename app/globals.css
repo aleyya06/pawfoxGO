@@ -846,6 +846,51 @@ th.angka {
   gap: 12px;
 }
 
+/* Tagihan: baris ringkas untuk verifikasi dan riwayat */
+.daftar-riwayat {
+  display: grid;
+  gap: 8px;
+}
+
+.baris-riwayat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--cream-kartu);
+  border: 1px solid var(--garis);
+  border-radius: var(--radius-tombol);
+  padding: 10px 14px;
+}
+
+.riwayat-nama {
+  font-weight: 600;
+}
+
+.riwayat-total {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  margin-left: auto;
+}
+
+.baris-riwayat .po-kartu-meta {
+  font-size: 0.85rem;
+}
+
+/* Motif paw di kartu negara */
+.negara-jumlah {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.paw-kecil {
+  width: 14px;
+  height: 14px;
+  fill: var(--orange);
+  flex-shrink: 0;
+}
+
 /* Footer */
 .footer {
   margin-top: 60px;
