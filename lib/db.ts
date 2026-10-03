@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { supabaseSiap, tandaiGagal } from "./supabase";
 import { profilIdSesi } from "./session";
 import { biayaPerSlot, hargaRupiah, type Batch, type Komponen, type Negara, type Pesanan, type Profil, type Review, type StatusPesanan, type StatusTracking, type ItemBatch } from "./data";
 import { batchCadangan, negaraCadangan, komponenCadangan, pesananCadangan, reviewCadangan } from "./katalog-cadangan";
@@ -105,15 +105,16 @@ interface BarisOrderItem {
 }
 
 // Pemutus sirkuit: kalau Supabase baru saja gagal, jangan coba lagi selama
-// satu menit, langsung pakai cadangan supaya halaman tetap cepat.
-let gagalSampai = 0;
+// sepuluh menit, langsung pakai cadangan supaya halaman tetap cepat. Disimpan
+// di globalThis karena Next membundel modul ini terpisah per rute.
+const globalKunci = globalThis as { __pawfoxGagalSampai?: number };
 const JEDA_GAGAL_MS = 10 * 60_000;
 
 async function ambil<T>(tabel: string): Promise<T[]> {
-  if (Date.now() < gagalSampai) {
+  if (Date.now() < (globalKunci.__pawfoxGagalSampai ?? 0)) {
     throw new Error("Supabase baru saja gagal dihubungi, sementara memakai data cadangan");
   }
-  const { data, error } = await supabase().from(tabel).select("*");
+  const { data, error } = await supabaseSiap().from(tabel).select("*");
   if (error) throw new Error(`Gagal membaca tabel ${tabel}: ${error.message}`);
   return (data ?? []) as T[];
 }
@@ -186,7 +187,7 @@ export async function muatKatalog(): Promise<Katalog> {
   } catch (galatAsli) {
     // Supabase gagal dihubungi: tampilkan katalog contoh supaya halaman
     // publik tetap utuh. Bukan kondisi normal; perbaiki koneksi di .env.local.
-    gagalSampai = Date.now() + JEDA_GAGAL_MS;
+    globalKunci.__pawfoxGagalSampai = Date.now() + JEDA_GAGAL_MS;
     console.error("Supabase tidak terjangkau, memakai katalog cadangan:", galatAsli instanceof Error ? galatAsli.message : galatAsli);
     return rangkaiKatalog(negaraCadangan, komponenCadangan, batchCadangan);
   }
@@ -200,7 +201,7 @@ export async function batchLengkapBySlug(slug: string): Promise<BatchLengkap | u
 
 export async function reviewTampil(batchId: string): Promise<Review[]> {
   try {
-    const { data, error } = await supabase()
+    const { data, error } = await supabaseSiap()
       .from("reviews")
       .select("*")
       .eq("batch_id", batchId)
@@ -222,7 +223,7 @@ export async function semuaReview(): Promise<(Review & { tampil: boolean })[]> {
 }
 
 export async function profilById(id: string): Promise<Profil | undefined> {
-  const { data, error } = await supabase().from("profiles").select("*").eq("id", id).maybeSingle();
+  const { data, error } = await supabaseSiap().from("profiles").select("*").eq("id", id).maybeSingle();
   if (error) throw new Error(`Gagal membaca profil: ${error.message}`);
   if (!data) return undefined;
   const baris = data as BarisProfil;
@@ -247,15 +248,15 @@ export async function upsertProfilLine(
   nama: string,
   avatarUrl: string | null
 ): Promise<{ profil: Profil; jadiAdmin: boolean }> {
-  const sb = supabase();
-  const { data: ada, error: errCari } = await sb.from("profiles").select("*").eq("line_user_id", lineUserId).maybeSingle();
+  const sb = supabaseSiap();
+  const { data: ada, error: errCari } = await supabaseSiap().from("profiles").select("*").eq("line_user_id", lineUserId).maybeSingle();
   if (errCari) throw new Error(`Gagal mencari profil: ${errCari.message}`);
   if (ada) {
     const baris = ada as BarisProfil;
-    await sb.from("profiles").update({ display_name: nama, avatar_url: avatarUrl }).eq("id", baris.id);
+    await supabaseSiap().from("profiles").update({ display_name: nama, avatar_url: avatarUrl }).eq("id", baris.id);
     return { profil: { id: baris.id, nama, avatarUrl: avatarUrl ?? undefined, isAdmin: baris.is_admin }, jadiAdmin: false };
   }
-  const { count } = await sb.from("profiles").select("id", { count: "exact", head: true }).eq("is_admin", true);
+  const { count } = await supabaseSiap().from("profiles").select("id", { count: "exact", head: true }).eq("is_admin", true);
   const jadiAdmin = (count ?? 0) === 0;
   const { data: baru, error: errBuat } = await sb
     .from("profiles")
@@ -304,14 +305,14 @@ async function susunPesanan(barisOrders: BarisOrder[]): Promise<Pesanan[]> {
 }
 
 export async function pesananProfil(profileId: string): Promise<Pesanan[]> {
-  const { data, error } = await supabase().from("orders").select("*").eq("profile_id", profileId);
+  const { data, error } = await supabaseSiap().from("orders").select("*").eq("profile_id", profileId);
   if (error) throw new Error(`Gagal membaca pesanan: ${error.message}`);
   return susunPesanan((data ?? []) as BarisOrder[]);
 }
 
 export async function pesananByKodeDb(kode: string): Promise<Pesanan | undefined> {
   try {
-    const { data, error } = await supabase().from("orders").select("*").eq("kode", kode.trim()).maybeSingle();
+    const { data, error } = await supabaseSiap().from("orders").select("*").eq("kode", kode.trim()).maybeSingle();
     if (error) throw new Error(`Gagal mencari pesanan: ${error.message}`);
     if (!data) return undefined;
     const [hasil] = await susunPesanan([data as BarisOrder]);
@@ -323,7 +324,7 @@ export async function pesananByKodeDb(kode: string): Promise<Pesanan | undefined
 
 export async function pesananByUsernameDb(username: string): Promise<Pesanan[]> {
   try {
-    const { data, error } = await supabase()
+    const { data, error } = await supabaseSiap()
       .from("orders")
       .select("*")
       .ilike("buyer_username", username.trim());
@@ -367,7 +368,7 @@ export async function buatPesanan(input: {
   const hargaSatuan = hargaRupiah(item.hargaLokal, batch.kursGo);
   const total = hargaSatuan * input.qty + biayaPerSlot(batch) * input.qty;
 
-  const { data: order, error: errOrder } = await supabase()
+  const { data: order, error: errOrder } = await supabaseSiap()
     .from("orders")
     .insert({
       kode,
@@ -383,7 +384,7 @@ export async function buatPesanan(input: {
     .single();
   if (errOrder || !order) throw new Error(`Gagal membuat tagihan: ${errOrder?.message ?? "tanpa data"}`);
 
-  const { error: errItem } = await supabase()
+  const { error: errItem } = await supabaseSiap()
     .from("order_items")
     .insert({ order_id: order.id, item_id: item.id, qty: input.qty, harga_satuan_rp: hargaSatuan });
   if (errItem) throw new Error(`Gagal menyimpan item tagihan: ${errItem.message}`);
@@ -391,7 +392,7 @@ export async function buatPesanan(input: {
 }
 
 export async function ubahStatusPesanan(orderId: string, status: StatusPesanan): Promise<void> {
-  const { error } = await supabase().from("orders").update({ status }).eq("id", orderId);
+  const { error } = await supabaseSiap().from("orders").update({ status }).eq("id", orderId);
   if (error) throw new Error(`Gagal mengubah status: ${error.message}`);
 }
 
@@ -401,14 +402,14 @@ export async function tambahTracking(
   catatan: string,
   tanggal: string
 ): Promise<void> {
-  const { error } = await supabase().from("tracking_updates").insert({ batch_id: batchId, status, catatan, tanggal });
+  const { error } = await supabaseSiap().from("tracking_updates").insert({ batch_id: batchId, status, catatan, tanggal });
   if (error) throw new Error(`Gagal menambah update tracking: ${error.message}`);
-  const { error: errBatch } = await supabase().from("batches").update({ status }).eq("id", batchId);
+  const { error: errBatch } = await supabaseSiap().from("batches").update({ status }).eq("id", batchId);
   if (errBatch) throw new Error(`Gagal memperbarui status batch: ${errBatch.message}`);
 }
 
 export async function toggleTampilReview(reviewId: number, tampil: boolean): Promise<void> {
-  const { error } = await supabase().from("reviews").update({ tampil }).eq("id", reviewId);
+  const { error } = await supabaseSiap().from("reviews").update({ tampil }).eq("id", reviewId);
   if (error) throw new Error(`Gagal mengubah review: ${error.message}`);
 }
 
