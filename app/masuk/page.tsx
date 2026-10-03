@@ -6,7 +6,8 @@ const PESAN_ERROR: Record<string, string> = {
   konfigurasi: "Login belum bisa dipakai karena kunci LINE di pengaturan server belum lengkap.",
   state: "Sesi login kedaluwarsa atau tidak cocok. Coba lagi dari awal.",
   token: "LINE nggak mau ngasih token. Coba lagi, kalau masih gagal hubungi admin.",
-  server: "Ada gangguan waktu proses masuk. Coba lagi.",
+  server:
+    "Login sampai LINE berhasil, tapi penyimpanan profilmu terganggu (kemungkinan database server belum tersambung). Coba lagi, atau hubungi admin.",
 };
 
 function tujuanAman(lanjut: string | undefined): string | null {
@@ -36,7 +37,8 @@ export default async function HalamanMasuk({
         Masuk dengan LINE
       </a>
       <p className="po-kartu-meta">
-        Belum mau login? Tetap bisa <a href="/cek-pesanan">cek pesanan</a> pakai kode order atau username.
+        Masuk nggak wajib buat lihat katalog. Katalog tetap terbuka, dan pembayaran serta konfirmasi order tetap
+        lewat DM admin.
       </p>
     </div>
   );

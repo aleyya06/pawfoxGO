@@ -48,7 +48,9 @@ export async function GET(req: NextRequest) {
     res.cookies.delete("pawfox_state");
     res.cookies.delete("pawfox_lanjut");
     return res;
-  } catch {
+  } catch (e) {
+    // Penyebab persisnya tercatat di log server; halaman buyer cuma lihat pesan umum.
+    console.error("Login LINE gagal:", e instanceof Error ? e.message : e);
     return NextResponse.redirect(new URL("/masuk?error=server", new URL(req.url).origin));
   }
 }
