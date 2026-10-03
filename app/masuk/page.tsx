@@ -10,36 +10,23 @@ const PESAN_ERROR: Record<string, string> = {
     "Login sampai LINE berhasil, tapi penyimpanan profilmu terganggu (kemungkinan database server belum tersambung). Coba lagi, atau hubungi admin.",
 };
 
-function tujuanAman(lanjut: string | undefined): string | null {
-  if (!lanjut || !lanjut.startsWith("/") || lanjut.startsWith("//")) return null;
-  return lanjut;
-}
-
 export default async function HalamanMasuk({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string; lanjut?: string }>;
 }) {
   const { error, lanjut } = await searchParams;
-  const tujuan = tujuanAman(lanjut);
+  const tujuan = lanjut && lanjut.startsWith("/") && !lanjut.startsWith("//") ? lanjut : null;
   const tautanMasuk = tujuan ? `/api/auth/line/start?lanjut=${encodeURIComponent(tujuan)}` : "/api/auth/line/start";
 
   return (
     <div className="wadah halaman-sempit">
       <h1>Masuk</h1>
-      <p className="bagian-pengantar">
-        Masuk pakai LINE biar tagihan, pesanan, dan katalog PO nempel ke akunmu sendiri. Tanpa password, cukup setuju
-        sekali.
-      </p>
       {tujuan && <p className="note">Login dulu ya, abis itu kamu langsung dibawa ke halaman yang tadi dibuka.</p>}
       {error && PESAN_ERROR[error] && <p className="note">{PESAN_ERROR[error]}</p>}
       <a className="tombol tombol-line" href={tautanMasuk}>
-        Masuk dengan LINE
+        Lanjut dengan LINE
       </a>
-      <p className="po-kartu-meta">
-        Masuk nggak wajib buat lihat katalog. Katalog tetap terbuka, dan pembayaran serta konfirmasi order tetap
-        lewat DM admin.
-      </p>
     </div>
   );
 }

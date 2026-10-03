@@ -36,8 +36,8 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
       {batch.catatan && <p className="note">{batch.catatan}</p>}
 
       <div className="info-kurs">
-        Kurs GO batch ini: 1 {negara.mataUang} = {formatRupiah(batch.kursGo)}
-        <small>Kurs GO fix selama batch jalan, beda dengan kurs live di kalkulator.</small>
+        Rate GO batch ini: 1 {negara.mataUang} = {formatRupiah(batch.kursGo)}
+        <small>Rate GO fix selama batch jalan, beda dengan rate live di kalkulator.</small>
       </div>
 
       <section className="bagian" aria-labelledby="judul-item">
@@ -79,24 +79,10 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
         <Timeline tracking={batch.tracking} statusSekarang={batch.status} />
       </section>
 
-      <section className="bagian" aria-labelledby="judul-ikut">
-        <h2 id="judul-ikut">Mau ikut PO ini?</h2>
-        <ol className="cara-ikut">
-          <li>Pilih item dan jumlahnya.</li>
-          <li>
-            Kirim DM ke{" "}
-            <a href={KONTAK.x} target="_blank" rel="noreferrer">
-              {KONTAK.xHandle}
-            </a>{" "}
-            di X dengan format: nama batch, nama item, jumlah.
-          </li>
-          <li>Tunggu konfirmasi total dari admin, lalu bayar sesuai jumlah itu.</li>
-        </ol>
-        <p className="po-kartu-meta">
-          Udah nerima barang dan mau kasih bintang? Ada form review di{" "}
-          <Link href="/#judul-review">beranda</Link>.
-        </p>
-      </section>
+      <p className="po-kartu-meta">
+        Udah nerima barang dan mau kasih bintang? Ada form review di{" "}
+        <Link href="/#judul-review">beranda</Link>.
+      </p>
     </div>
   );
 }

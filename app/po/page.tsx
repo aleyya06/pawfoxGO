@@ -23,10 +23,6 @@ export default async function HalamanPO() {
   return (
     <div className="wadah">
       <h1>PO &amp; Batch</h1>
-      <p className="bagian-pengantar">
-        Dibagi per negara, lalu per komponen, lalu per batch. Buka batchnya buat lihat harga, rincian biaya, dan
-        tracking.
-      </p>
       {katalog.negaraList.map((n) => {
         const batches = katalog.batchList.filter(
           (b) => katalog.komponenList.find((k) => k.id === b.komponenId)?.negara === n.kode
@@ -63,7 +59,7 @@ export default async function HalamanPO() {
                         PO {formatTanggal(b.bukaPo)} sampai {formatTanggal(b.tutupPo)}
                       </p>
                       <p className="po-kartu-meta">
-                        {slot.terisi}/{slot.kuota} slot · kurs GO 1 {n.mataUang} = {formatRupiah(b.kursGo)}
+                        {slot.terisi}/{slot.kuota} slot · rate GO 1 {n.mataUang} = {formatRupiah(b.kursGo)}
                       </p>
                       <div className="po-kartu-aksi">
                         <Link className="tombol tombol-kedua" href={`/po/${b.slug}`}>

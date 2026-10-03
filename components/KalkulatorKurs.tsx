@@ -151,15 +151,15 @@ export default function KalkulatorKurs({ ringkas = false }: { ringkas?: boolean 
       </div>
 
       <p className={`kurs-status${kurs.sumber === "cadangan" ? " gagal" : ""}`} role="status">
-        {kurs.sumber === "live" && `Kurs live dari open.er-api.com, diperbarui ${kurs.waktu}.`}
+        {kurs.sumber === "live" && `Rate live dari open.er-api.com, diperbarui ${kurs.waktu}.`}
         {kurs.sumber === "cadangan" &&
-          "Kurs live gagal diambil, jadi yang terpakai kurs cadangan kasar. Angkanya bisa beda dari kurs yang jalan sekarang."}
+          "Rate live gagal diambil, jadi yang terpakai rate cadangan kasar. Angkanya bisa beda dari kurs yang jalan sekarang."}
       </p>
 
       {!ringkas && (
         <div className="tabel-gulir">
           <table>
-            <caption className="tabel-judul">Kurs live hari ini (1 unit mata uang dalam rupiah)</caption>
+            <caption className="tabel-judul">Rate live hari ini (1 unit mata uang dalam rupiah)</caption>
             <thead>
               <tr>
                 <th scope="col">Mata uang</th>

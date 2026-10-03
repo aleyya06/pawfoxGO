@@ -34,19 +34,9 @@ export default function ModalMasuk({ terbuka, tutup }: { terbuka: boolean; tutup
         <h2 id="modal-masuk-judul" className="modal-judul">
           Masuk dulu ya
         </h2>
-        <p className="modal-penjelasan">
-          Masuk pakai LINE biar tagihan, pesanan, dan profil nempel ke akunmu sendiri. Tanpa password, cukup setuju
-          sekali.
-        </p>
         <a className="tombol tombol-line tombol-penuh" href="/api/auth/line/start">
           Lanjut dengan LINE
         </a>
-        <p className="po-kartu-meta">
-          Login lewat WhatsApp, X, atau Discord menyusul. Baru di PawFox GO? Cukup login, datamu tersimpan otomatis.
-        </p>
-        <button type="button" className="tombol tombol-kedua tombol-penuh" onClick={tutup}>
-          Lihat-lihat dulu
-        </button>
       </div>
     </div>
   );

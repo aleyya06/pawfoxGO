@@ -29,28 +29,18 @@ export const KONTAK = {
 };
 
 export type StatusTracking =
-  | "po_dibuka"
-  | "po_ditutup"
-  | "produksi"
-  | "warehouse_asal"
-  | "berangkat"
-  | "otw_indonesia"
-  | "tiba_indonesia"
-  | "sorting"
-  | "siap_dikirim"
-  | "selesai";
+  | "open"
+  | "done_checkout"
+  | "arrived_wh_asal"
+  | "arrived_indonesia"
+  | "arrived_admin";
 
 export const STATUS_TRACKING: { id: StatusTracking; label: string }[] = [
-  { id: "po_dibuka", label: "PO dibuka" },
-  { id: "po_ditutup", label: "PO ditutup" },
-  { id: "produksi", label: "Produksi / menunggu rilis" },
-  { id: "warehouse_asal", label: "Sampai warehouse negara asal" },
-  { id: "berangkat", label: "Berangkat (departure)" },
-  { id: "otw_indonesia", label: "OTW ke Indonesia" },
-  { id: "tiba_indonesia", label: "Tiba di Indonesia" },
-  { id: "sorting", label: "Sorting di warehouse lokal" },
-  { id: "siap_dikirim", label: "Siap diambil / dikirim" },
-  { id: "selesai", label: "Selesai" },
+  { id: "open", label: "Open" },
+  { id: "done_checkout", label: "Done checkout" },
+  { id: "arrived_wh_asal", label: "Arrived WH negara asal" },
+  { id: "arrived_indonesia", label: "Arrived Indonesia" },
+  { id: "arrived_admin", label: "Arrived admin" },
 ];
 
 export function labelStatus(status: StatusTracking): string {

@@ -26,7 +26,7 @@ const negara = [
 ];
 
 const komponen = [
-  { id: "id-lokal", country_kode: "ID", nama: "GO Lokal", deskripsi: "Split barang yang sudah ada di Indonesia.", urutan: 1 },
+  { id: "id-photocard", country_kode: "ID", nama: "Photocard", deskripsi: "Split photocard yang ready di admin.", urutan: 1 },
   { id: "th-album", country_kode: "TH", nama: "Album & Merch", deskripsi: "Album dan merch resmi dari toko Thailand.", urutan: 1 },
   { id: "kr-album", country_kode: "KR", nama: "Album", deskripsi: "Album dari toko resmi Korea, termasuk po benefit.", urutan: 1 },
   { id: "cn-album", country_kode: "CN", nama: "Album", deskripsi: "Album versi China dari platform resmi.", urutan: 1 },
@@ -38,37 +38,37 @@ const batches = [
     id: "cn-album-batch-1", component_id: "cn-album", nama: "Album China Batch 1", slug: "cn-album-batch-1",
     buka_po: "2026-09-25", tutup_po: "2026-10-10", kurs_go: 2450,
     ongkir_lokal: 15000, ongkir_internasional: 25000, fee_organizer: 5000,
-    status: "po_dibuka", catatan: "Kurs GO fix di 1 CNY = Rp2.450 sampai PO tutup.",
+    status: "open", catatan: "Rate GO fix di 1 CNY = Rp2.450 sampai batch ditutup.",
   },
   {
     id: "th-album-batch-2", component_id: "th-album", nama: "Album Thailand Batch 2", slug: "th-album-batch-2",
     buka_po: "2026-09-28", tutup_po: "2026-10-15", kurs_go: 480,
     ongkir_lokal: 18000, ongkir_internasional: 30000, fee_organizer: 5000,
-    status: "po_dibuka", catatan: "Pengiriman dari Bangkok sekitar 3 minggu setelah PO tutup.",
+    status: "open", catatan: "Pengiriman dari Bangkok sekitar 3 minggu setelah batch ditutup.",
   },
   {
     id: "th-merch-batch-1", component_id: "th-album", nama: "Merch Thailand Batch 1", slug: "th-merch-batch-1",
     buka_po: "2026-08-10", tutup_po: "2026-08-25", kurs_go: 470,
     ongkir_lokal: 18000, ongkir_internasional: 30000, fee_organizer: 5000,
-    status: "tiba_indonesia", catatan: null,
+    status: "arrived_indonesia", catatan: null,
   },
   {
     id: "kr-album-batch-5", component_id: "kr-album", nama: "Album Korea Batch 5", slug: "kr-album-batch-5",
     buka_po: "2026-09-01", tutup_po: "2026-09-20", kurs_go: 12,
     ongkir_lokal: 12000, ongkir_internasional: 28000, fee_organizer: 5000,
-    status: "berangkat", catatan: null,
+    status: "arrived_wh_asal", catatan: null,
   },
   {
     id: "jp-merch-batch-2", component_id: "jp-merch", nama: "Merch Jepang Batch 2", slug: "jp-merch-batch-2",
     buka_po: "2026-08-05", tutup_po: "2026-08-30", kurs_go: 108,
     ongkir_lokal: 16000, ongkir_internasional: 32000, fee_organizer: 5000,
-    status: "sorting", catatan: null,
+    status: "arrived_admin", catatan: null,
   },
   {
-    id: "id-lokal-batch-1", component_id: "id-lokal", nama: "Split GO Lokal Batch 1", slug: "id-lokal-batch-1",
+    id: "id-photocard-smtr25", component_id: "id-photocard", nama: "Photocard SMTR25", slug: "photocard-smtr25",
     buka_po: "2026-09-15", tutup_po: "2026-10-05", kurs_go: 1,
     ongkir_lokal: 10000, ongkir_internasional: 0, fee_organizer: 5000,
-    status: "po_dibuka", catatan: "Barang ready di tangan, tinggal split ongkir domestik.",
+    status: "arrived_admin", catatan: "Barang udah arrived di admin, tinggal diambil atau dikirim.",
   },
 ];
 
@@ -83,31 +83,28 @@ const items = [
   { id: "kr-album-b5-pob", batch_id: "kr-album-batch-5", nama: "POB Photocard", harga_lokal: 3500, kuota: 30, terisi: 21, urutan: 2 },
   { id: "jp-merch-b2-mag", batch_id: "jp-merch-batch-2", nama: "Official Fan Magazine Vol. 9", harga_lokal: 2200, kuota: 12, terisi: 11, urutan: 1 },
   { id: "jp-merch-b2-acs", batch_id: "jp-merch-batch-2", nama: "Acrylic Stand", harga_lokal: 1650, kuota: 12, terisi: 7, urutan: 2 },
-  { id: "id-lokal-b1-slot", batch_id: "id-lokal-batch-1", nama: "Album Split Slot", harga_lokal: 145000, kuota: 10, terisi: 4, urutan: 1 },
-  { id: "id-lokal-b1-pc", batch_id: "id-lokal-batch-1", nama: "Photocard Random", harga_lokal: 25000, kuota: 20, terisi: 13, urutan: 2 },
+  { id: "id-pc-smtr25-slot", batch_id: "id-photocard-smtr25", nama: "Slot Photocard SMTR25", harga_lokal: 145000, kuota: 10, terisi: 4, urutan: 1 },
+  { id: "id-pc-smtr25-random", batch_id: "id-photocard-smtr25", nama: "Photocard Random", harga_lokal: 25000, kuota: 20, terisi: 13, urutan: 2 },
 ];
 
 const tracking = [
-  { batch_id: "cn-album-batch-1", status: "po_dibuka", catatan: "PO dibuka, kuota 20 slot per versi.", tanggal: "2026-09-25" },
-  { batch_id: "cn-album-batch-1", status: "po_dibuka", catatan: "Slot ver. S udah setengah terisi.", tanggal: "2026-10-01" },
-  { batch_id: "th-album-batch-2", status: "po_dibuka", catatan: "PO dibuka, kurs fix 1 THB = Rp480.", tanggal: "2026-09-28" },
-  { batch_id: "th-merch-batch-1", status: "po_dibuka", catatan: "PO dibuka untuk merch limited.", tanggal: "2026-08-10" },
-  { batch_id: "th-merch-batch-1", status: "po_ditutup", catatan: "PO tutup, plush doll full slot.", tanggal: "2026-08-25" },
-  { batch_id: "th-merch-batch-1", status: "warehouse_asal", catatan: "Semua barang sampai warehouse Bangkok.", tanggal: "2026-09-05" },
-  { batch_id: "th-merch-batch-1", status: "berangkat", catatan: "Berangkat via kargo udara.", tanggal: "2026-09-18" },
-  { batch_id: "th-merch-batch-1", status: "tiba_indonesia", catatan: "Sampai Jakarta, lagi proses bea cukai.", tanggal: "2026-10-01" },
-  { batch_id: "kr-album-batch-5", status: "po_dibuka", catatan: "PO dibuka, kurs fix 1 KRW = Rp12.", tanggal: "2026-09-01" },
-  { batch_id: "kr-album-batch-5", status: "po_ditutup", catatan: "PO tutup, 27/30 slot album terisi.", tanggal: "2026-09-20" },
-  { batch_id: "kr-album-batch-5", status: "produksi", catatan: "Menunggu rilis resmi album.", tanggal: "2026-09-22" },
-  { batch_id: "kr-album-batch-5", status: "warehouse_asal", catatan: "Barang lengkap sampai warehouse Korea.", tanggal: "2026-09-29" },
-  { batch_id: "kr-album-batch-5", status: "berangkat", catatan: "Berangkat dari Incheon.", tanggal: "2026-10-02" },
-  { batch_id: "jp-merch-batch-2", status: "po_dibuka", catatan: "PO dibuka untuk fan magazine vol. 9.", tanggal: "2026-08-05" },
-  { batch_id: "jp-merch-batch-2", status: "po_ditutup", catatan: "PO tutup tepat waktu.", tanggal: "2026-08-30" },
-  { batch_id: "jp-merch-batch-2", status: "warehouse_asal", catatan: "Sampai warehouse Tokyo.", tanggal: "2026-09-12" },
-  { batch_id: "jp-merch-batch-2", status: "berangkat", catatan: "Berangkat via kargo laut+jalur cepat.", tanggal: "2026-09-20" },
-  { batch_id: "jp-merch-batch-2", status: "tiba_indonesia", catatan: "Tiba di Jakarta dan lolos bea cukai.", tanggal: "2026-10-01" },
-  { batch_id: "jp-merch-batch-2", status: "sorting", catatan: "Sorting per nama buyer di warehouse lokal.", tanggal: "2026-10-03" },
-  { batch_id: "id-lokal-batch-1", status: "po_dibuka", catatan: "Split dibuka, barang ready stock.", tanggal: "2026-09-15" },
+  { batch_id: "cn-album-batch-1", status: "open", catatan: "Batch dibuka, kuota 20 slot per versi.", tanggal: "2026-09-25" },
+  { batch_id: "cn-album-batch-1", status: "open", catatan: "Slot ver. S udah setengah terisi.", tanggal: "2026-10-01" },
+  { batch_id: "th-album-batch-2", status: "open", catatan: "Batch dibuka, rate fix 1 THB = Rp480.", tanggal: "2026-09-28" },
+  { batch_id: "th-merch-batch-1", status: "open", catatan: "Batch dibuka untuk merch limited.", tanggal: "2026-08-10" },
+  { batch_id: "th-merch-batch-1", status: "done_checkout", catatan: "Semua buyer udah checkout.", tanggal: "2026-08-25" },
+  { batch_id: "th-merch-batch-1", status: "arrived_wh_asal", catatan: "Barang sampai warehouse Bangkok.", tanggal: "2026-09-05" },
+  { batch_id: "th-merch-batch-1", status: "arrived_indonesia", catatan: "Sampai Jakarta, udah lewat bea cukai.", tanggal: "2026-10-01" },
+  { batch_id: "kr-album-batch-5", status: "open", catatan: "Batch dibuka, rate fix 1 KRW = Rp12.", tanggal: "2026-09-01" },
+  { batch_id: "kr-album-batch-5", status: "done_checkout", catatan: "Batch ditutup, 27/30 slot album terisi.", tanggal: "2026-09-20" },
+  { batch_id: "kr-album-batch-5", status: "arrived_wh_asal", catatan: "Barang lengkap sampai warehouse Korea dan udah dikirim.", tanggal: "2026-10-02" },
+  { batch_id: "jp-merch-batch-2", status: "open", catatan: "Batch dibuka untuk fan magazine vol. 9.", tanggal: "2026-08-05" },
+  { batch_id: "jp-merch-batch-2", status: "done_checkout", catatan: "Batch ditutup tepat waktu.", tanggal: "2026-08-30" },
+  { batch_id: "jp-merch-batch-2", status: "arrived_wh_asal", catatan: "Sampai warehouse Tokyo.", tanggal: "2026-09-12" },
+  { batch_id: "jp-merch-batch-2", status: "arrived_indonesia", catatan: "Tiba di Jakarta dan lolos bea cukai.", tanggal: "2026-10-01" },
+  { batch_id: "jp-merch-batch-2", status: "arrived_admin", catatan: "Sampai admin, lagi dibagi per buyer.", tanggal: "2026-10-03" },
+  { batch_id: "id-photocard-smtr25", status: "open", catatan: "Split dibuka, barang ready stock.", tanggal: "2026-09-15" },
+  { batch_id: "id-photocard-smtr25", status: "arrived_admin", catatan: "Photocard udah arrived di admin, siap dibagi.", tanggal: "2026-10-03" },
 ];
 
 const reviews = [
@@ -127,6 +124,11 @@ const order = {
 };
 
 await cekGagal((await sb.from("countries").upsert(negara)).error, "upsert countries");
+// Bersihkan baris lama yang sudah tidak terpakai (component dan batch GO Lokal lama).
+await sb.from("tracking_updates").delete().eq("batch_id", "id-lokal-batch-1");
+await sb.from("batch_items").delete().eq("batch_id", "id-lokal-batch-1");
+await sb.from("batches").delete().eq("id", "id-lokal-batch-1");
+await sb.from("components").delete().eq("id", "id-lokal");
 await cekGagal((await sb.from("components").upsert(komponen)).error, "upsert components");
 await cekGagal((await sb.from("batches").upsert(batches)).error, "upsert batches");
 await cekGagal((await sb.from("batch_items").upsert(items)).error, "upsert batch_items");

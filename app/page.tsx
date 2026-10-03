@@ -38,10 +38,11 @@ export default async function Beranda() {
     <>
       <section className="wadah hero">
         <div>
-          <h1>PO K-pop dari luar negeri, rapi dan bisa dipantau.</h1>
+          <h1>Welcome Back!</h1>
           <p className="bagian-pengantar">
-            PawFox GO ngurusin album, merch, dan barang resmi dari Thailand, Korea Selatan, China, dan Jepang. Cek batch
-            yang lagi jalan, hitung kursnya, dan pantau posisi barang dari warehouse sampai tiba di Indonesia.
+            PawFox GO bantuin kamu jajan album, merch, dan barang resmi dari Thailand, Korea Selatan, China, dan
+            Jepang. Cek batch yang lagi jalan, hitung rate, dan pantau posisi barang dari warehouse sampai tiba di
+            Indonesia.
           </p>
           <div className="hero-aksi">
             <Link className="tombol" href="/po">
@@ -64,7 +65,7 @@ export default async function Beranda() {
       </section>
 
       <section className="wadah bagian" aria-labelledby="judul-po-aktif">
-        <h2 id="judul-po-aktif">PO yang lagi buka</h2>
+        <h2 id="judul-po-aktif">Ongoing batch</h2>
         {poAktif.length === 0 ? (
           <div className="kosong">
             <p>Belum ada PO yang buka sekarang.</p>
@@ -93,7 +94,7 @@ export default async function Beranda() {
                   <h3 className="po-kartu-nama">{b.nama}</h3>
                   <Countdown tutupPo={b.tutupPo} />
                   <p className="po-kartu-meta">
-                    {slot.terisi}/{slot.kuota} slot terisi · kurs GO 1 {info.negara.mataUang} = {formatRupiah(b.kursGo)}
+                    {slot.terisi}/{slot.kuota} slot terisi · rate GO 1 {info.negara.mataUang} = {formatRupiah(b.kursGo)}
                   </p>
                   <div className="po-kartu-aksi">
                     <Link className="tombol" href={`/po/${b.slug}`}>
@@ -155,7 +156,7 @@ export default async function Beranda() {
       <section className="wadah bagian" aria-labelledby="judul-kurs">
         <h2 id="judul-kurs">Hitung cepat</h2>
         <p className="bagian-pengantar">
-          Ketik angkanya, langsung jadi rupiah. Kurs GO tiap batch dihitung terpisah di halaman batchnya.
+          Ketik angkanya, langsung jadi rupiah. Rate GO tiap batch dihitung terpisah di halaman batchnya.
         </p>
         <KalkulatorKurs ringkas />
       </section>
