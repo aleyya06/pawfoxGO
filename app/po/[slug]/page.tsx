@@ -4,9 +4,9 @@ import { notFound } from "next/navigation";
 import Countdown from "@/components/Countdown";
 import StatusBadge from "@/components/StatusBadge";
 import Timeline from "@/components/Timeline";
-import { KONTAK, MATA_UANG, biayaPerSlot, hargaRupiah, totalSlot } from "@/lib/data";
+import { KONTAK, MATA_UANG, hargaRupiah, totalSlot } from "@/lib/data";
 import { formatAngka, formatRupiah, formatTanggal } from "@/lib/format";
-import { batchLengkapBySlug, reviewTampil } from "@/lib/db";
+import { batchLengkapBySlug } from "@/lib/db";
 
 export const metadata: Metadata = { title: "Detail Batch" };
 export const dynamic = "force-dynamic";
@@ -17,8 +17,6 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
   if (!data) notFound();
   const { batch, komponen, negara } = data;
   const slot = totalSlot(batch);
-  const tambahan = biayaPerSlot(batch);
-  const reviews = await reviewTampil(batch.id).catch(() => []);
 
   return (
     <div className="wadah">
@@ -72,73 +70,13 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
         </div>
         <p className="po-kartu-meta">
           Total slot {slot.terisi}/{slot.kuota}. Harga rupiah = harga lokal dikali kurs GO, dibulatkan ke atas ke
-          Rp500 terdekat.
+          Rp500 terdekat. Ongkir dan fee dihitung admin saat konfirmasi total ke kamu.
         </p>
-      </section>
-
-      <section className="bagian" aria-labelledby="judul-biaya">
-        <h2 id="judul-biaya">Rincian biaya per slot</h2>
-        <div className="tabel-gulir">
-          <table>
-            <tbody>
-              <tr>
-                <td>Ongkir lokal (di negara asal)</td>
-                <td className="angka">{formatRupiah(batch.ongkirLokal)}</td>
-              </tr>
-              <tr>
-                <td>Ongkir internasional</td>
-                <td className="angka">{formatRupiah(batch.ongkirInternasional)}</td>
-              </tr>
-              <tr>
-                <td>Fee organizer</td>
-                <td className="angka">{formatRupiah(batch.feeOrganizer)}</td>
-              </tr>
-              <tr>
-                <td>
-                  <strong>Total tambahan per slot</strong>
-                </td>
-                <td className="angka">
-                  <strong>{formatRupiah(tambahan)}</strong>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p className="po-kartu-meta">Total bayar per item = harga rupiah item + tambahan per slot.</p>
       </section>
 
       <section className="bagian" aria-labelledby="judul-tracking">
         <h2 id="judul-tracking">Tracking batch</h2>
         <Timeline tracking={batch.tracking} statusSekarang={batch.status} />
-      </section>
-
-      <section className="bagian" aria-labelledby="judul-review">
-        <h2 id="judul-review">Kata buyer</h2>
-        {reviews.length === 0 ? (
-          <p className="kosong">Belum ada review untuk batch ini.</p>
-        ) : (
-          <div className="grid grid-po">
-            {reviews.map((r) => (
-              <article key={r.id} className="kartu review-kartu">
-                <p className="bintang" aria-label={`rating ${r.bintang} dari 5`}>
-                  {"★".repeat(r.bintang)}
-                  <span className="bintang-kosong">{"★".repeat(5 - r.bintang)}</span>
-                </p>
-                <p className="review-teks">{r.teks}</p>
-                <p className="po-kartu-meta">
-                  {r.nama} · {formatTanggal(r.tanggal)}
-                </p>
-              </article>
-            ))}
-          </div>
-        )}
-        <p className="po-kartu-meta">
-          Udah terima barangmu? DM{" "}
-          <a href={KONTAK.x} target="_blank" rel="noreferrer">
-            {KONTAK.xHandle}
-          </a>{" "}
-          dengan format: kode order, bintang (1 sampai 5), dan ceritamu. Review asli buyer akan ditampilkan di sini.
-        </p>
       </section>
 
       <section className="bagian" aria-labelledby="judul-ikut">
@@ -152,8 +90,12 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
             </a>{" "}
             di X dengan format: nama batch, nama item, jumlah.
           </li>
-          <li>Tunggu konfirmasi slot, lalu bayar sesuai total di atas.</li>
+          <li>Tunggu konfirmasi total dari admin, lalu bayar sesuai jumlah itu.</li>
         </ol>
+        <p className="po-kartu-meta">
+          Udah nerima barang dan mau kasih bintang? Ada form review di{" "}
+          <Link href="/#judul-review">beranda</Link>.
+        </p>
       </section>
     </div>
   );

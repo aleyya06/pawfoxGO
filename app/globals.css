@@ -891,6 +891,73 @@ th.angka {
   flex-shrink: 0;
 }
 
+/* Form review di beranda */
+.review-form-wrap {
+  margin-top: 18px;
+  max-width: 640px;
+}
+
+.form-review {
+  display: grid;
+  gap: 12px;
+}
+
+.form-review-judul {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.pilih-bintang {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tombol-bintang {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.7rem;
+  line-height: 1;
+  padding: 4px;
+  color: var(--garis);
+  transition: color 0.15s ease;
+}
+
+.tombol-bintang.aktif {
+  color: var(--orange);
+}
+
+.tombol-bintang:focus-visible {
+  outline: 3px solid var(--coklat-mid);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.baris-form-review {
+  display: grid;
+  gap: 12px;
+}
+
+@media (min-width: 560px) {
+  .baris-form-review {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.review-teks-input {
+  width: 100%;
+  min-height: 96px;
+  font-size: 1rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-tombol);
+  border: 2px solid var(--garis);
+  background: #fff;
+  color: var(--coklat);
+  font-family: var(--font-isi);
+  resize: vertical;
+}
+
 /* Footer */
 .footer {
   margin-top: 60px;

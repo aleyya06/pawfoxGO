@@ -222,6 +222,38 @@ export async function semuaReview(): Promise<(Review & { tampil: boolean })[]> {
     .sort((a, b) => b.tanggal.localeCompare(a.tanggal));
 }
 
+// Review yang tampil publik di beranda, lengkap dengan nama batchnya.
+export async function semuaReviewTampil(): Promise<(Review & { batchNama: string })[]> {
+  try {
+    const { data, error } = await supabaseSiap().from("reviews").select("*").eq("tampil", true);
+    if (error) throw new Error(`Gagal membaca review: ${error.message}`);
+    const katalog = await muatKatalog();
+    const namaBatch = new Map(katalog.batchList.map((b) => [b.id, b.nama]));
+    return ((data ?? []) as BarisReview[])
+      .map((r) => ({
+        id: r.id,
+        batchId: r.batch_id,
+        nama: r.nama,
+        tanggal: r.tanggal,
+        bintang: r.bintang,
+        teks: r.teks,
+        batchNama: namaBatch.get(r.batch_id) ?? "Batch",
+      }))
+      .sort((a, b) => b.tanggal.localeCompare(a.tanggal));
+  } catch {
+    const namaBatch = new Map(batchCadangan.map((b) => [b.id, b.nama]));
+    return reviewCadangan.map((r) => ({ ...r, batchNama: namaBatch.get(r.batchId) ?? "Batch" }));
+  }
+}
+
+// Review baru dari buyer: masuk dengan tampil=false, menunggu moderasi admin.
+export async function kirimReview(input: { batchId: string; nama: string; bintang: number; teks: string }): Promise<void> {
+  const { error } = await supabaseSiap()
+    .from("reviews")
+    .insert({ batch_id: input.batchId, nama: input.nama, bintang: input.bintang, teks: input.teks, tampil: false });
+  if (error) throw new Error(`Gagal menyimpan review: ${error.message}`);
+}
+
 export async function profilById(id: string): Promise<Profil | undefined> {
   const { data, error } = await supabaseSiap().from("profiles").select("*").eq("id", id).maybeSingle();
   if (error) throw new Error(`Gagal membaca profil: ${error.message}`);

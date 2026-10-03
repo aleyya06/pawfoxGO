@@ -1,11 +1,12 @@
 import Link from "next/link";
 import Countdown from "@/components/Countdown";
+import FormReview from "@/components/FormReview";
 import KalkulatorKurs from "@/components/KalkulatorKurs";
 import PawIkon from "@/components/PawIkon";
 import StatusBadge from "@/components/StatusBadge";
 import { KONTAK } from "@/lib/data";
-import { formatRupiah } from "@/lib/format";
-import { muatKatalog } from "@/lib/db";
+import { formatRupiah, formatTanggal } from "@/lib/format";
+import { muatKatalog, semuaReviewTampil } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,7 @@ export default async function Beranda() {
   }
 
   const poAktif = katalog.batchList.filter((b) => b.status === "po_dibuka");
+  const reviews = await semuaReviewTampil();
   const jumlahBatchNegara = (kode: string) =>
     katalog.batchList.filter((b) => katalog.komponenList.find((k) => k.id === b.komponenId)?.negara === kode).length;
 
@@ -122,6 +124,31 @@ export default async function Beranda() {
               </Link>
             );
           })}
+        </div>
+      </section>
+
+      <section className="wadah bagian" aria-labelledby="judul-review">
+        <h2 id="judul-review">Kata buyer</h2>
+        {reviews.length === 0 ? (
+          <p className="kosong">Belum ada review. Jadilah yang pertama lewat form di bawah.</p>
+        ) : (
+          <div className="grid grid-po">
+            {reviews.map((r) => (
+              <article key={r.id} className="kartu review-kartu">
+                <p className="bintang" aria-label={`rating ${r.bintang} dari 5`}>
+                  {"★".repeat(r.bintang)}
+                  <span className="bintang-kosong">{"★".repeat(5 - r.bintang)}</span>
+                </p>
+                <p className="review-teks">{r.teks}</p>
+                <p className="po-kartu-meta">
+                  {r.nama} · {r.batchNama} · {formatTanggal(r.tanggal)}
+                </p>
+              </article>
+            ))}
+          </div>
+        )}
+        <div className="review-form-wrap">
+          <FormReview batches={katalog.batchList.map((b) => ({ id: b.id, nama: b.nama }))} />
         </div>
       </section>
 
