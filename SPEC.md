@@ -2,7 +2,7 @@
 
 Project folder: `pawfox`. Status: Fase 1 terbangun dan terverifikasi (2026-10-03), termasuk struktur Cek Pesanan dan review buyer.
 
-Brand: **PawFox GO** (senada X @pawfoxgo). Suasana: **orange dan cream**, cute & hangat, tipografi membulat (Baloo 2 + Plus Jakarta Sans). Arah lengkap di `DESIGN.md`. Logo di `assets/logo/pawfox-logo-hd.png`, dipakai dengan `mix-blend-mode: multiply` supaya latar putihnya menyatu dengan cream. Kontak: X @pawfoxgo, email pawfox0512@gmail.com.
+Brand: **PawFox GO** (senada X @pawfoxgo). Suasana sejak redesign November 2026: **kertas cream, espresso, aksen terracotta dan lilac holo**, motif tiket/air waybill, tipografi Plus Jakarta Sans + JetBrains Mono. Arah lengkap di `DESIGN.md`. Logo di `public/logo.png`, dipakai dengan `mix-blend-mode: multiply` supaya latar putihnya menyatu dengan cream. Kontak: X @pawfoxgo, email pawfox0512@gmail.com.
 
 Website group order (GO) personal: satu organizer (kamu) sebagai admin tunggal, buyer tanpa akun. Buyer bisa lihat katalog PO per negara, hitung kurs, pantau tracking batch, cek pesanannya lewat search bar, dan baca review buyer.
 

@@ -1,0 +1,556 @@
+/* Motif tiket: kartu batch (boarding pass), pass detail batch, strip
+   filter negara, stempel status, bilah slot, dan daftar tracking. */
+
+/* Strip filter negara */
+.strip-negara {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 22px;
+}
+
+.strip-pilihan {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 10px 6px 12px;
+  border: 1.5px solid var(--garis-kuat);
+  border-radius: var(--r-tombol);
+  background: var(--tiket);
+  color: var(--espresso);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.strip-pilihan:hover {
+  color: var(--espresso);
+  border-color: var(--espresso);
+}
+
+.strip-pilihan[data-aktif] {
+  background: var(--espresso);
+  border-color: var(--espresso);
+  color: var(--kertas);
+}
+
+.strip-jumlah {
+  min-width: 1.7em;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: var(--sand);
+  color: var(--espresso);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.strip-pilihan[data-aktif] .strip-jumlah {
+  background: var(--terracotta);
+}
+
+/* Tumpukan tiket: satu kolom, dua kolom hanya kalau tiketnya 3 ke atas */
+.tumpukan-tiket {
+  display: grid;
+  gap: 18px;
+}
+
+@media (min-width: 1100px) {
+  .tumpukan-tiket.dua-kolom {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Tiket batch dan pass detail berbagi badan yang sama */
+.tiket,
+.pass {
+  --takik: 22px;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  background: var(--tiket);
+  border: 1.5px solid var(--espresso);
+  border-radius: var(--r-panel);
+  box-shadow: var(--bayang-kertas);
+}
+
+.tiket-badan,
+.pass-badan {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 18px 18px 20px;
+  min-width: 0;
+}
+
+.tiket-atas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+.tiket-negara {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.tiket-nama {
+  margin: 4px 0 0;
+  font-size: clamp(1.25rem, 1.1rem + 0.7vw, 1.55rem);
+}
+
+.tiket-rute {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.tiket-rute-pesawat {
+  width: 16px;
+  height: 16px;
+  transform: rotate(90deg);
+  color: var(--tinta-terracotta);
+}
+
+.tiket-tutup {
+  margin: 0;
+  padding: 3px 8px;
+  border-radius: var(--r-badge);
+  background: var(--sand);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.tiket-tutup.lewat span {
+  color: var(--tinta-terracotta);
+}
+
+.tiket-stempel {
+  margin-top: 6px;
+}
+
+/* Garis sobek dengan takik setengah lingkaran di kedua ujung.
+   Takiknya lingkaran warna kanvas yang hanya diberi tepi di separuh dalam,
+   jadi tampak seperti potongan pada tiket. */
+.tiket-sobek {
+  position: relative;
+  z-index: 1;
+  height: 0;
+  border-top: 2px dashed var(--sobek);
+  margin-inline: 14px;
+}
+
+.tiket-sobek::before,
+.tiket-sobek::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--takik) / -2 - 1px);
+  width: var(--takik);
+  height: var(--takik);
+  border-radius: 50%;
+  background: var(--kertas);
+  border: 1.5px solid;
+}
+
+.tiket-sobek::before {
+  left: calc(-14px - var(--takik) / 2 - 0.75px);
+  border-color: var(--espresso) var(--espresso) transparent transparent;
+  transform: rotate(45deg);
+}
+
+.tiket-sobek::after {
+  right: calc(-14px - var(--takik) / 2 - 0.75px);
+  border-color: transparent transparent var(--espresso) var(--espresso);
+  transform: rotate(45deg);
+}
+
+.tiket-stub,
+.pass-stub {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  background: var(--sand);
+  border-radius: 0 0 calc(var(--r-panel) - 1.5px) calc(var(--r-panel) - 1.5px);
+  min-width: 0;
+}
+
+.tiket-stub .tombol {
+  margin-top: auto;
+}
+
+@media (min-width: 680px) {
+  .tiket {
+    grid-template-columns: minmax(0, 1fr) 0 minmax(220px, 0.58fr);
+  }
+
+  .pass {
+    grid-template-columns: minmax(0, 1fr) 0 minmax(260px, 0.5fr);
+  }
+
+  .tiket-badan,
+  .pass-badan {
+    padding: 22px 26px 24px;
+  }
+
+  .pass-badan {
+    padding: 28px 32px;
+  }
+
+  .tiket-sobek {
+    height: auto;
+    width: 0;
+    margin: 14px 0;
+    border-top: 0;
+    border-left: 2px dashed var(--sobek);
+  }
+
+  .tiket-sobek::before,
+  .tiket-sobek::after {
+    left: calc(var(--takik) / -2 - 1px);
+    right: auto;
+  }
+
+  .tiket-sobek::before {
+    top: calc(-14px - var(--takik) / 2 - 0.75px);
+    border-color: transparent transparent var(--espresso) var(--espresso);
+    transform: rotate(-45deg);
+  }
+
+  .tiket-sobek::after {
+    top: auto;
+    bottom: calc(-14px - var(--takik) / 2 - 0.75px);
+    border-color: var(--espresso) var(--espresso) transparent transparent;
+    transform: rotate(-45deg);
+  }
+
+  .tiket-stub,
+  .pass-stub {
+    padding: 22px;
+    border-radius: 0 calc(var(--r-panel) - 1.5px) calc(var(--r-panel) - 1.5px) 0;
+  }
+}
+
+/* Stempel status */
+.stempel {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border: 2px solid currentColor;
+  border-radius: var(--r-stempel);
+  font-family: var(--font-kode);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  line-height: 1.3;
+  transform: rotate(-4deg);
+  transform-origin: left center;
+}
+
+.stempel-open {
+  color: var(--tinta-emerald);
+  background: rgba(31, 138, 91, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(31, 138, 91, 0.35);
+}
+
+.stempel-siap {
+  color: var(--tinta-lilac);
+  background: #efedfe;
+}
+
+.stempel-jalan {
+  color: var(--espresso);
+  background: var(--tiket);
+}
+
+/* Bilah slot */
+.bilah-slot {
+  display: grid;
+  gap: 6px;
+}
+
+.bilah-slot-teks {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.bilah-slot-teks .mono {
+  font-size: 1.15rem;
+}
+
+.bilah-slot-jalur {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--tiket);
+  border: 1.5px solid var(--espresso);
+  overflow: hidden;
+}
+
+.bilah-slot-isi {
+  display: block;
+  height: 100%;
+  background: var(--terracotta);
+  transform-origin: left center;
+}
+
+.sisa-slot {
+  align-self: flex-start;
+  margin: 0;
+  padding: 2px 8px;
+  border-radius: var(--r-badge);
+  background: var(--tiket);
+  border: 1.5px solid var(--garis-kuat);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.sisa-slot.mendesak {
+  border-color: var(--tinta-terracotta);
+  color: var(--tinta-terracotta);
+  background: #fbe7e1;
+}
+
+.pil-rate {
+  align-self: flex-start;
+  margin: 0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--espresso);
+  color: var(--kertas);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Pass detail batch */
+.pass-nama {
+  font-size: clamp(1.9rem, 1.3rem + 2.6vw, 3rem);
+  margin: 6px 0 0;
+}
+
+.pass-rute {
+  font-size: 0.95rem;
+}
+
+.pass-data {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: 12px 24px;
+  width: 100%;
+  margin: 8px 0 4px;
+}
+
+.pass-data dt {
+  font-family: var(--font-kode);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--teks-redup);
+}
+
+.pass-data dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+}
+
+.pass-data dd.lewat {
+  color: var(--tinta-terracotta);
+}
+
+.pass-catatan {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--teks-redup);
+}
+
+.halaman-batch .note {
+  margin-top: 22px;
+}
+
+.manifest td:first-child {
+  font-weight: 700;
+}
+
+/* Di layar sempit tiap item jadi kartu kecil: nama di atas, tiga angka di
+   bawahnya dengan labelnya sendiri, supaya tabel tidak perlu digeser. */
+@media (max-width: 559px) {
+  .manifest thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .manifest tr {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px 10px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--garis);
+  }
+
+  .manifest tbody tr:last-child {
+    border-bottom: 0;
+  }
+
+  .manifest td {
+    padding: 0;
+    border: 0;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .manifest td:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .manifest td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-family: var(--font-isi);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--teks-redup);
+  }
+
+  .manifest td[colspan] {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Daftar tracking dengan rel posisi */
+.daftar-lacak {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.lacak-baris {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  background: var(--tiket);
+  border: 1.5px solid var(--espresso);
+  border-radius: var(--r-panel);
+  box-shadow: var(--bayang-kertas);
+}
+
+.lacak-nama {
+  margin: 4px 0 0;
+  font-size: 1.2rem;
+}
+
+.lacak-update {
+  min-width: 0;
+}
+
+.lacak-update time {
+  font-size: 0.8rem;
+  color: var(--teks-redup);
+}
+
+.lacak-update p {
+  margin: 2px 0 0;
+}
+
+.lacak-tombol {
+  justify-self: start;
+}
+
+.rel-titik {
+  --isi: 0;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 18px;
+  max-width: 260px;
+}
+
+.rel-titik::before,
+.rel-titik::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+.rel-titik::before {
+  right: 7px;
+  background: var(--garis-kuat);
+}
+
+.rel-titik::after {
+  width: calc((100% - 14px) * var(--isi));
+  background: var(--espresso);
+}
+
+.rel-titik span {
+  position: relative;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--tiket);
+  border: 2px solid var(--garis-kuat);
+}
+
+.rel-titik span.lewat {
+  background: var(--espresso);
+  border-color: var(--espresso);
+}
+
+.rel-titik span.sekarang {
+  width: 18px;
+  height: 18px;
+  background: var(--terracotta);
+  border-color: var(--espresso);
+}
+
+.rel-label {
+  margin: 8px 0 0;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.rel-label .mono {
+  color: var(--teks-redup);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+@media (min-width: 900px) {
+  .lacak-baris {
+    grid-template-columns: minmax(0, 1.1fr) minmax(180px, 0.8fr) minmax(0, 1.3fr) auto;
+    align-items: center;
+    gap: 28px;
+    padding: 20px 24px;
+  }
+
+  .lacak-tombol {
+    justify-self: end;
+  }
+}

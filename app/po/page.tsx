@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import StatusBadge from "@/components/StatusBadge";
+import StripNegara, { SEMUA } from "@/components/StripNegara";
+import TiketBatch from "@/components/TiketBatch";
 import { KONTAK } from "@/lib/data";
-import { formatRupiah, formatTanggal } from "@/lib/format";
 import { muatKatalog } from "@/lib/db";
+import { keTiket, negaraBatch } from "@/lib/tampilan";
 
 export const metadata: Metadata = { title: "PO & Batch" };
 export const dynamic = "force-dynamic";
 
-export default async function HalamanPO() {
+export default async function HalamanPO({ searchParams }: { searchParams: Promise<{ negara?: string }> }) {
   let katalog;
   try {
     katalog = await muatKatalog();
@@ -20,60 +20,63 @@ export default async function HalamanPO() {
     );
   }
 
+  const { negara: paramNegara } = await searchParams;
+  const negaraAktif = katalog.negaraList.find((n) => n.kode === paramNegara?.toUpperCase());
+  const aktif = negaraAktif?.kode ?? SEMUA;
+  const sekarang = Date.now();
+
+  // Batch yang masih buka di depan, sisanya urut tanggal tutup terbaru.
+  const semua = [...katalog.batchList].sort((a, b) => {
+    const bukaA = a.status === "open" ? 0 : 1;
+    const bukaB = b.status === "open" ? 0 : 1;
+    return bukaA - bukaB || b.tutupPo.localeCompare(a.tutupPo);
+  });
+  const tampil = negaraAktif ? semua.filter((b) => negaraBatch(katalog, b) === negaraAktif.kode) : semua;
+
+  const pilihan = [
+    { kode: SEMUA, nama: "Semua", jumlah: katalog.batchList.length },
+    ...katalog.negaraList.map((n) => ({
+      kode: n.kode,
+      nama: n.nama,
+      jumlah: katalog.batchList.filter((b) => negaraBatch(katalog, b) === n.kode).length,
+    })),
+  ];
+
   return (
-    <div className="wadah">
-      <h1>PO &amp; Batch</h1>
-      {katalog.negaraList.map((n) => {
-        const batches = katalog.batchList.filter(
-          (b) => katalog.komponenList.find((k) => k.id === b.komponenId)?.negara === n.kode
-        );
-        return (
-          <section key={n.kode} id={`negara-${n.kode}`} className="bagian" aria-labelledby={`judul-${n.kode}`}>
-            <h2 id={`judul-${n.kode}`}>
-              {n.nama} <span className="chip">{n.mataUang}</span>
-            </h2>
-            {batches.length === 0 ? (
-              <p className="kosong">
-                Belum ada batch untuk {n.nama}. Pantau{" "}
-                <a href={KONTAK.x} target="_blank" rel="noreferrer">
-                  {KONTAK.xHandle}
-                </a>{" "}
-                buat pengumuman.
-              </p>
-            ) : (
-              <div className="grid grid-po">
-                {batches.map((b) => {
-                  const komponen = katalog.komponenList.find((k) => k.id === b.komponenId);
-                  const slot = {
-                    terisi: b.items.reduce((a, i) => a + i.terisi, 0),
-                    kuota: b.items.reduce((a, i) => a + i.kuota, 0),
-                  };
-                  return (
-                    <article key={b.id} className="kartu po-kartu">
-                      <div className="po-kartu-atas">
-                        <span className="badge badge-netral">{komponen?.nama ?? "Umum"}</span>
-                        <StatusBadge status={b.status} />
-                      </div>
-                      <h3 className="po-kartu-nama">{b.nama}</h3>
-                      <p className="po-kartu-meta">
-                        PO {formatTanggal(b.bukaPo)} sampai {formatTanggal(b.tutupPo)}
-                      </p>
-                      <p className="po-kartu-meta">
-                        {slot.terisi}/{slot.kuota} slot · rate GO 1 {n.mataUang} = {formatRupiah(b.kursGo)}
-                      </p>
-                      <div className="po-kartu-aksi">
-                        <Link className="tombol tombol-kedua" href={`/po/${b.slug}`}>
-                          Lihat detail
-                        </Link>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-        );
-      })}
+    <div className="wadah halaman">
+      <header className="kepala-halaman">
+        <h1>PO &amp; Batch</h1>
+        <p className="bagian-pengantar">
+          Semua batch per negara, yang masih buka di paling depan. Tiap tiket mencatat rate GO, slot, dan tanggal tutup
+          batchnya.
+        </p>
+      </header>
+
+      <StripNegara
+        pilihan={pilihan}
+        aktif={aktif}
+        hrefUntuk={(kode) => (kode === SEMUA ? "/po" : `/po?negara=${kode}`)}
+        label="Filter batch per negara"
+      />
+
+      {tampil.length === 0 ? (
+        <div className="kosong kosong-tiket">
+          <p className="kosong-judul">Belum ada batch untuk {negaraAktif?.nama ?? "saat ini"}.</p>
+          <p>
+            Pengumuman batch baru selalu lewat{" "}
+            <a href={KONTAK.x} target="_blank" rel="noreferrer">
+              {KONTAK.xHandle}
+            </a>
+            .
+          </p>
+        </div>
+      ) : (
+        <div className={`tumpukan-tiket${tampil.length >= 3 ? " dua-kolom" : ""}`}>
+          {tampil.map((b) => (
+            <TiketBatch key={b.id} t={keTiket(katalog, b, sekarang)} judulTag="h2" />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

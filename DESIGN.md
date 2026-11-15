@@ -1,50 +1,69 @@
 # DESIGN.md: PawFox GO
 
-Arah desain resmi PawFox GO. Filter antislop berlaku di atas arah ini.
+Arah desain resmi PawFox GO ("Collector's Parcel & Holo-Editorial"), menggantikan arah oranye-cream lama per redesign November 2026. Filter antislop berlaku di atas arah ini.
 
 ## Identitas
 
-- Nama tampilan: PawFox GO (senada akun X @pawfoxgo, pilihan user).
-- Produk: website group order K-pop personal, satu organizer.
+- Nama tampilan: PawFox GO (senada akun X @pawfoxgo).
+- Produk: group order K-pop personal, satu organizer, barang dari Thailand, Korea Selatan, China, dan Jepang, plus split lokal Indonesia.
 - Kontak: X @pawfoxgo, email pawfox0512@gmail.com.
-- Logo: puppy + fox chibi bertengger di lingkaran paw besar (`assets/logo/pawfox-logo-hd.png`). Background putih logo disembunyikan dengan CSS `mix-blend-mode: multiply` di atas latar cream, tanpa perlu mengedit gambar.
+- Logo: puppy + fox chibi di lingkaran paw (`public/logo.png`, latar putih solid). Dipakai di atas permukaan cream dengan `mix-blend-mode: multiply`. Di atas permukaan gelap, logo selalu duduk di dalam cakram cream (emblem), tidak pernah langsung di atas espresso.
 
 ## Kepribadian
 
-- Cute & hangat (pilihan user): ramah, santai, tidak formal, senada karakter logo chibi.
-- Bahasa Indonesia kasual yang tetap sopan; istilah GO (PO, slot, kurs) dipakai secara wajar.
+- Editorial yang berani tapi tetap hangat: bentuk kertas, tiket, dan label kiriman yang biasa dipegang kolektor.
+- Bahasa Indonesia kasual dan sopan ("jajan", "tanpa drama"). Istilah GO (PO, slot, rate, batch) dipakai apa adanya.
+- Tidak ada klaim yang tidak bisa dibuktikan: tidak ada "verified", "real-time", angka statistik, atau testimoni karangan.
 
-## Palet (diambil langsung dari warna asli logo)
+## Palet
 
-- Orange utama `#EC884A` (bulu fox): tombol utama, highlight, aksen aktif.
-- Cream dasar `#FBF3E4`: latar halaman. Cream permukaan `#FEFAE2`: kartu.
-- Coklat tua `#47241E` (outline logo): semua teks, heading, border tegas.
-- Coklat sedang `#975737`: teks sekunder, garis bantu.
-- Blush `#F5C6CC` (blush logo): aksen kecil untuk status positif (lunas, selesai).
+Inti (dipakai apa adanya untuk isian dan teks besar):
 
-Alasan: palet = warna asli logo, jadi logo nyemplung tanpa kotak latar. Teks selalu coklat tua di atas cream atau orange (kontras aman); orange tidak pernah jadi warna teks di atas cream karena kontrasnya gagal WCAG.
+- Cream kertas `#FAF6F0`: kanvas halaman.
+- Sand `#F1EAE0`: permukaan sekunder (stub tiket, chip, kepala tabel).
+- Espresso `#181412`: semua teks utama, blok gelap (footer, alur paket) dengan teks `#FAF6F0`.
+- Terracotta fox `#E85D3F`: aksen utama. Tombol utama, garis rute aktif, penanda urgensi.
+- Lilac holo `#7C6FF6`: aksen kolektor. Tag batch, kilau holo, status "Arrived admin".
+- Emerald `#1F8A5B`: khusus stempel OPEN.
+
+Netral tambahan: kertas tiket `#FFFDF8` (kartu di atas kanvas cream).
+
+Tinta teks kecil (lolos WCAG AA 4.5:1 di cream dan sand, dicek dengan contrast-check):
+
+- Terracotta tinta `#B23C20` (5.48:1 di cream, 4.94:1 di sand).
+- Lilac tinta `#5446D1` (6.15:1 di cream).
+- Emerald tinta `#176E48` (5.80:1 di cream).
+
+Aturan: tombol terracotta selalu berteks espresso (5.29:1). Putih di atas terracotta (3.46:1) tidak dipakai. Warna inti hanya jadi teks kalau ukurannya besar (18px tebal ke atas).
+
+Alasan: kanvas kertas + espresso memberi kontras tinggi ala editorial; terracotta datang dari warna fox di logo; lilac mewakili kilau holo photocard, benda yang memang dikoleksi buyer.
 
 ## Tipografi
 
-- Judul: Baloo 2 (rounded, ujung membulat, satu karakter dengan logo chibi).
-- Isi dan angka: Plus Jakarta Sans (jernih untuk harga, kuota, tanggal).
-- Alasan: kepribadian "membulat & ramah" pilihan user; angka harga dan kuota butuh sans yang mudah dibaca cepat.
+- Plus Jakarta Sans 500/600/700/800: judul (`letter-spacing: -0.025em`, `line-height: 1.12`) dan isi. Alasan: huruf Indonesia yang tegas di bobot 800, tetap jernih untuk paragraf.
+- JetBrains Mono 400/500/600: kode bandara (BKK, ICN, PVG, NRT, CGK), rate, rasio slot (20/40), tanggal tutup, kode order. Alasan: angka tabular sejajar dan rasa label kiriman. Mono tidak pernah dipakai untuk judul besar.
 
 ## Bentuk & komponen
 
-- Radius: kartu 16px, tombol 12px, badge 8px. Tidak ada pill di semua elemen (R-11).
-- Shadow: satu tingkat elevasi saja, khusus kartu PO aktif dan panel kalkulator sebagai penanda fokus; sisanya flat (R-12).
-- Ikon: hanya yang relevan dengan konten (mata uang, status), tanpa sparkle/star (R-04).
-- Motif identitas: jejak paw. Dipakai sebagai bullet timeline tracking (paw terisi = status terlewati, paw kosong = belum), bullet daftar, dan ornamen footer. Satu motif, diulang, jadi tanda tangan visual.
+- Motif identitas: tiket/air waybill. Kartu batch berbentuk boarding pass dengan takik dan garis sobek, stub kanan berisi slot, rate, dan tombol. Kode rute mono berulang di hero, tiket, dan detail batch.
+- Paw dari logo tetap hidup sebagai bullet timeline tracking (paw terisi = status terlewati).
+- Radius: tiket dan panel 14px, tombol 10px, chip filter 10px, badge 6px, stempel 4px. Pill hanya untuk navbar mengambang dan CTA di dalamnya.
+- Bayangan: tiket memakai bayangan keras 2px (kertas bertumpuk). Bayangan lembut hanya untuk kartu hero (elemen paling depan) dan navbar mengambang.
+- Glass: hanya navbar (satu elemen), karena konten lewat di bawahnya saat scroll.
+- Holo: gradien conic lilac-terracotta hanya di cincin emblem hero dan pojok kartu review. Alasan: meniru foil holo photocard.
+- Ikon: set SVG buatan sendiri dengan garis tebal 2.25 senada outline logo (pesawat, warehouse, kotak, rumah, menu, tutup, bintang, tautan luar). Tanpa Lucide.
+- Bendera: SVG inline (emoji bendera tidak tampil di Windows).
 
 ## Dial
 
-ENERGY 2 / RHYTHM 2 / MOTION 1
+ENERGY 3 / RHYTHM 3 / MOTION 2
 
-- ENERGY 2: hangat dan ramah, tetap tenang; bukan halaman marketing yang berteriak.
-- RHYTHM 2: grid konsisten dengan variasi dari konten: beranda (hero + baris negara + widget kurs), halaman batch (tabel item + rincian biaya + timeline), tracking (timeline panjang). Variasi datang dari jenis konten, bukan dekorasi.
-- MOTION 1: hover states dan transisi angka countdown halus saja, tanpa animasi loop. Alasan: halaman ini dibuka ulang berkali-kali oleh buyer untuk cek status; gerak berlebihan mengganggu.
+- ENERGY 3: hero berani dengan kartu waybill interaktif dan blok espresso kontras.
+- RHYTHM 3: tiap seksi beranda punya komposisi sendiri: hero dua kolom, tumpukan tiket, blok gelap alur paket, slip hitung, dinding review.
+- MOTION 2 di beranda: tilt kartu hero (pointer halus saja), busur rute digambar sekali saat negara dipilih dengan satu titik berjalan ke CGK, transisi filter batch, garis progres alur paket. Tidak ada animasi loop tanpa pemicu.
+- Halaman yang sering dibuka ulang (`/tracking`, `/po/[slug]`) tetap di level hover dan transisi saja, karena buyer datang ke sana untuk cek status, bukan untuk ditonton.
+- Semua gerak mati di `prefers-reduced-motion: reduce`.
 
 ## Tema
 
-Terang saja. Alasan: identitas brand adalah cream; logo berdiri di atas putih/cream, dan dark mode akan melawan palet itu.
+Terang saja, dengan blok gelap espresso sebagai kontras seksi. Alasan: identitas brand adalah kertas cream, dan logo berlatar putih butuh permukaan terang.

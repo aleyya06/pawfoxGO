@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Ikon from "./Ikon";
 
 export default function ModalMasuk({ terbuka, tutup }: { terbuka: boolean; tutup: () => void }) {
   const kartu = useRef<HTMLDivElement>(null);
@@ -29,7 +30,7 @@ export default function ModalMasuk({ terbuka, tutup }: { terbuka: boolean; tutup
         onClick={(e) => e.stopPropagation()}
       >
         <button type="button" className="modal-tutup" aria-label="Tutup" onClick={tutup}>
-          ×
+          <Ikon nama="tutup" />
         </button>
         <h2 id="modal-masuk-judul" className="modal-judul">
           Masuk dulu ya

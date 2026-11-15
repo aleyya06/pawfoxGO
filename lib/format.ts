@@ -30,6 +30,16 @@ export function formatTanggalJam(unixDetik: number): string {
   }).format(new Date(unixDetik * 1000));
 }
 
+// Rate per 1 unit mata uang asing: Won dan Yen bernilai di bawah Rp100,
+// jadi butuh dua desimal supaya tidak terbaca Rp11 padahal Rp11,40.
+export function formatRate(n: number): string {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: n < 100 ? 2 : 0,
+  }).format(n);
+}
+
 export function simbol(k: KodeMataUang): string {
   return MATA_UANG[k].simbol;
 }

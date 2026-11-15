@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import StatusBadge from "@/components/StatusBadge";
+import Bendera from "@/components/Bendera";
+import RelPosisi from "@/components/RelPosisi";
+import StripNegara, { SEMUA } from "@/components/StripNegara";
 import { KONTAK } from "@/lib/data";
 import { formatTanggal } from "@/lib/format";
 import { muatKatalog } from "@/lib/db";
+import { negaraBatch, updateTerakhir } from "@/lib/tampilan";
 
 export const metadata: Metadata = { title: "Tracking Batch" };
 export const dynamic = "force-dynamic";
 
-export default async function HalamanTracking() {
+export default async function HalamanTracking({ searchParams }: { searchParams: Promise<{ negara?: string }> }) {
   let katalog;
   try {
     katalog = await muatKatalog();
@@ -20,23 +23,46 @@ export default async function HalamanTracking() {
     );
   }
 
-  const terakhir = (batchId: string) => {
-    const batch = katalog.batchList.find((b) => b.id === batchId);
-    return batch && batch.tracking.length > 0 ? batch.tracking[batch.tracking.length - 1] : undefined;
-  };
+  const { negara: paramNegara } = await searchParams;
+  const negaraAktif = katalog.negaraList.find((n) => n.kode === paramNegara?.toUpperCase());
+  const aktif = negaraAktif?.kode ?? SEMUA;
+
   const urut = [...katalog.batchList].sort((a, b) =>
-    (terakhir(b.id)?.tanggal ?? "").localeCompare(terakhir(a.id)?.tanggal ?? "")
+    (updateTerakhir(b)?.tanggal ?? "").localeCompare(updateTerakhir(a)?.tanggal ?? "")
   );
+  const tampil = negaraAktif ? urut.filter((b) => negaraBatch(katalog, b) === negaraAktif.kode) : urut;
+
+  const pilihan = [
+    { kode: SEMUA, nama: "Semua", jumlah: katalog.batchList.length },
+    ...katalog.negaraList.map((n) => ({
+      kode: n.kode,
+      nama: n.nama,
+      jumlah: katalog.batchList.filter((b) => negaraBatch(katalog, b) === n.kode).length,
+    })),
+  ];
 
   return (
-    <div className="wadah">
-      <h1>Tracking Batch</h1>
-      <p className="bagian-pengantar">Posisi terbaru tiap batch. Timeline lengkapnya ada di halaman batch masing-masing.</p>
-      {urut.length === 0 ? (
-        <div className="kosong">
-          <p>Belum ada batch yang jalan.</p>
+    <div className="wadah halaman">
+      <header className="kepala-halaman">
+        <h1>Tracking Batch</h1>
+        <p className="bagian-pengantar">
+          Posisi terbaru tiap batch, yang paling baru di-update di atas. Timeline lengkap dan semua catatannya ada di
+          halaman batch masing-masing.
+        </p>
+      </header>
+
+      <StripNegara
+        pilihan={pilihan}
+        aktif={aktif}
+        hrefUntuk={(kode) => (kode === SEMUA ? "/tracking" : `/tracking?negara=${kode}`)}
+        label="Filter tracking per negara"
+      />
+
+      {tampil.length === 0 ? (
+        <div className="kosong kosong-tiket">
+          <p className="kosong-judul">Belum ada batch dari {negaraAktif?.nama ?? "negara mana pun"}.</p>
           <p>
-            Pengumuman batch baru lewat X:{" "}
+            Pengumuman batch baru lewat{" "}
             <a href={KONTAK.x} target="_blank" rel="noreferrer">
               {KONTAK.xHandle}
             </a>
@@ -44,34 +70,40 @@ export default async function HalamanTracking() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-po">
-          {urut.map((b) => {
+        <ul className="daftar-lacak">
+          {tampil.map((b) => {
             const info = katalog.lengkap(b.id)!;
-            const update = terakhir(b.id);
+            const update = updateTerakhir(b);
             return (
-              <article key={b.id} className="kartu po-kartu">
-                <div className="po-kartu-atas">
-                  <span className="chip">{info.negara.nama}</span>
-                  <StatusBadge status={b.status} />
-                </div>
-                <h3 className="po-kartu-nama">{b.nama}</h3>
-                <p className="po-kartu-meta">{info.komponen.nama}</p>
-                {update ? (
-                  <p className="po-kartu-meta">
-                    Update terakhir {formatTanggal(update.tanggal)}: {update.catatan}
+              <li key={b.id} className="lacak-baris">
+                <div className="lacak-identitas">
+                  <p className="tiket-negara">
+                    <Bendera kode={info.negara.kode} />
+                    <span className="mono">{info.negara.kode}</span>
+                    <span>{info.komponen.nama}</span>
                   </p>
-                ) : (
-                  <p className="po-kartu-meta">Belum ada update tracking.</p>
-                )}
-                <div className="po-kartu-aksi">
-                  <Link className="tombol tombol-kedua" href={`/po/${b.slug}`}>
-                    Lihat timeline
-                  </Link>
+                  <h2 className="lacak-nama">{b.nama}</h2>
                 </div>
-              </article>
+                <RelPosisi status={b.status} />
+                <div className="lacak-update">
+                  {update ? (
+                    <>
+                      <time className="mono" dateTime={update.tanggal}>
+                        {formatTanggal(update.tanggal)}
+                      </time>
+                      <p>{update.catatan || "Status diperbarui."}</p>
+                    </>
+                  ) : (
+                    <p>Belum ada update tracking.</p>
+                  )}
+                </div>
+                <Link className="tombol tombol-kedua lacak-tombol" href={`/po/${b.slug}`}>
+                  Lihat timeline
+                </Link>
+              </li>
             );
           })}
-        </div>
+        </ul>
       )}
     </div>
   );
