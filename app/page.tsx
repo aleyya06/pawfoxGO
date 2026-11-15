@@ -41,12 +41,12 @@ export default async function Beranda() {
       <section className="wadah hero" aria-labelledby="judul-hero">
         <div className="hero-teks">
           <h1 id="judul-hero" className="hero-judul">
-            Jajan Album &amp; POB A2O SOUL Lintas Negara, <span className="hero-sorot">Tanpa Drama Tracking.</span>
+            Jajan Album &amp; Merch Lintas Negara, <span className="hero-sorot">Tanpa Drama Tracking.</span>
           </h1>
           <p className="hero-sub">
-            Group order personal untuk album, POB A2O SOUL, dan photocard resmi dari Korea Selatan, China, Thailand, dan
-            Jepang. Rate GO tiap batch dikunci dari awal, dan posisi barangmu bisa dipantau dari warehouse negara asal
-            sampai tiba di Indonesia.
+            Group order personal untuk album, POB, dan photocard resmi dari Thailand, Korea Selatan, China, dan Jepang.
+            Rate GO tiap batch dikunci dari awal, dan posisi barangmu bisa dipantau dari warehouse negara asal sampai tiba
+            di Indonesia.
           </p>
           <div className="hero-aksi">
             <Link className="tombol tombol-besar" href="/po">

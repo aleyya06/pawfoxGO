@@ -1,24 +1,26 @@
-import { STATUS_TRACKING, urutanStatus, type StatusTracking, type UpdateTracking } from "@/lib/data";
+import { STATUS_TRACKING, labelStatusBatch, urutanStatus, type StatusTracking, type UpdateTracking } from "@/lib/data";
 import { formatTanggal } from "@/lib/format";
 import PawIkon from "./PawIkon";
 
 // Timeline lengkap di halaman batch: lima stop sebaris di desktop dengan
 // catatan di bawah tiap stop, stepper tegak di mobile. Bullet paw terisi
-// berarti status sudah terlewati.
+// berarti status sudah terlewati. Tahap warehouse menyebut negara batch.
 export default function Timeline({
   tracking,
   statusSekarang,
+  negara,
   tutup = false,
 }: {
   tracking: UpdateTracking[];
   statusSekarang: StatusTracking;
+  negara: string;
   tutup?: boolean;
 }) {
   const posisi = urutanStatus(statusSekarang);
 
   return (
     <ol className="timeline">
-      {STATUS_TRACKING.map(({ id, label }, i) => {
+      {STATUS_TRACKING.map(({ id }, i) => {
         const tercapai = i <= posisi;
         const sekarang = id === statusSekarang;
         const updates = tracking.filter((t) => t.status === id);
@@ -33,7 +35,7 @@ export default function Timeline({
             </span>
             <div className="timeline-isi">
               <p className="timeline-label">
-                {label}
+                {labelStatusBatch(id, negara)}
                 {sekarang && (
                   <span className="timeline-sekarang mono">
                     {id === "open" && tutup ? "PO sudah ditutup" : "Posisi sekarang"}

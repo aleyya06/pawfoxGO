@@ -4,7 +4,6 @@
 import {
   A2O_SOUL_MEMBERS,
   AWALAN_ITEM_MEMBER,
-  labelStatus,
   totalSlot,
   type Batch,
   type ItemBatch,
@@ -50,7 +49,6 @@ export interface TiketData {
   mataUang: KodeMataUang;
   kursGo: number;
   status: StatusTracking;
-  statusLabel: string;
   tutupLabel: string;
   lewat: boolean;
   sisaHari: number | null;
@@ -89,7 +87,6 @@ export function keTiket(katalog: Katalog, batch: Batch, sekarang: number): Tiket
     mataUang: info.negara.mataUang,
     kursGo: batch.kursGo,
     status: batch.status,
-    statusLabel: labelStatus(batch.status),
     tutupLabel: formatTanggal(batch.tutupPo),
     lewat,
     sisaHari: sekarang > batas ? null : Math.max(1, Math.ceil((batas - sekarang) / 86_400_000)),

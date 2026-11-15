@@ -23,7 +23,7 @@ export default function TiketBatch({ t, judulTag = "h3" }: { t: TiketData; judul
             <Bendera kode={t.negaraKode} />
             {t.negaraNama}
           </span>
-          <StempelStatus status={t.status} tutup={t.lewat} />
+          <StempelStatus status={t.status} negara={t.negaraKode} tutup={t.lewat} />
         </div>
         <Judul id={`tiket-${t.id}`} className="tiket-nama">
           {t.nama}
@@ -35,7 +35,7 @@ export default function TiketBatch({ t, judulTag = "h3" }: { t: TiketData; judul
             {masihBuka && t.sisaHari !== null && ` · ${t.sisaHari} hari lagi`}
           </span>
         </p>
-        <PoolingMember member={t.member} />
+        <PoolingMember member={t.member} ringkas />
       </div>
 
       <div className="tiket-sobek" aria-hidden="true" />

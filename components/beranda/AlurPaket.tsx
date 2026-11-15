@@ -25,8 +25,8 @@ const LANGKAH: {
   {
     judul: "Tiba di warehouse luar negeri",
     ikon: "gudang",
-    status: "Arrived WH negara asal",
-    isi: "Setelah batch ditutup dan semua buyer checkout, toko mengirim barang ke warehouse di negara asal. Begitu sampai, statusnya pindah dan catatannya muncul di halaman batch.",
+    status: "Arrived WH Korea, China, Thailand, atau Jepang",
+    isi: "Setelah batch ditutup dan semua buyer checkout, toko mengirim barang ke warehouse di negara asal batch. Begitu sampai, statusnya pindah (misalnya Arrived WH Korea) dan catatannya muncul di halaman batch.",
     jaminan: "Tiap perpindahan status ada tanggal dan catatannya.",
   },
   {

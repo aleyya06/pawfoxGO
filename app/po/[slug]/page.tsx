@@ -8,7 +8,7 @@ import Ikon from "@/components/Ikon";
 import PoolingMember from "@/components/PoolingMember";
 import StempelStatus from "@/components/StempelStatus";
 import Timeline from "@/components/Timeline";
-import { MATA_UANG, hargaRupiah, totalSlot } from "@/lib/data";
+import { A2O_SOUL_MEMBERS, MATA_UANG, batchA2OSoul, hargaRupiah, totalSlot } from "@/lib/data";
 import { formatAngka, formatRupiah, formatTanggal } from "@/lib/format";
 import { batchLengkapBySlug } from "@/lib/db";
 import { IATA_ASAL, IATA_TUJUAN, masihBuka, slotMember } from "@/lib/tampilan";
@@ -40,7 +40,7 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
               <Bendera kode={negara.kode} />
               {negara.nama}
             </span>
-            <StempelStatus status={batch.status} tutup={tutup} />
+            <StempelStatus status={batch.status} negara={negara.kode} tutup={tutup} />
           </div>
           <h1 id="judul-batch" className="pass-nama">
             {batch.nama}
@@ -56,10 +56,13 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
             )}
           </p>
           <dl className="pass-data">
-            <div>
-              <dt>Buka PO</dt>
-              <dd className="mono">{formatTanggal(batch.bukaPo)}</dd>
-            </div>
+            {/* Tanggal buka yang sama dengan tanggal tutup berarti belum dicatat. */}
+            {batch.bukaPo < batch.tutupPo && (
+              <div>
+                <dt>Buka PO</dt>
+                <dd className="mono">{formatTanggal(batch.bukaPo)}</dd>
+              </div>
+            )}
             <div>
               <dt>Tutup PO</dt>
               <dd className="mono">{formatTanggal(batch.tutupPo)}</dd>
@@ -91,7 +94,10 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
 
       {batch.catatan && <p className="note">{batch.catatan}</p>}
 
-      <PoolingMember member={slotMember(batch.items)} />
+      <PoolingMember
+        member={slotMember(batch.items)}
+        daftarNama={batchA2OSoul(batch.nama) ? A2O_SOUL_MEMBERS : []}
+      />
 
       <section className="bagian" aria-labelledby="judul-item">
         <h2 id="judul-item">Item &amp; harga</h2>
@@ -121,10 +127,10 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
                   <tr key={item.id}>
                     <td>{item.nama}</td>
                     <td className="angka mono" data-label="Harga lokal">
-                      {MATA_UANG[negara.mataUang].simbol} {formatAngka(item.hargaLokal)}
+                      {item.hargaLokal > 0 ? `${MATA_UANG[negara.mataUang].simbol} ${formatAngka(item.hargaLokal)}` : "Menyusul"}
                     </td>
                     <td className="angka mono" data-label="Harga rupiah">
-                      {formatRupiah(hargaRupiah(item.hargaLokal, batch.kursGo))}
+                      {item.hargaLokal > 0 ? formatRupiah(hargaRupiah(item.hargaLokal, batch.kursGo)) : "Menyusul"}
                     </td>
                     <td className="angka mono" data-label="Slot">
                       {item.terisi}/{item.kuota}
@@ -136,6 +142,7 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
           </table>
         </div>
         <p className="catatan-kecil">
+          {batch.items.some((i) => i.hargaLokal <= 0) && "Harga yang tertulis menyusul diumumkan admin lewat X. "}
           Harga rupiah = harga lokal dikali rate GO, dibulatkan ke atas ke Rp500 terdekat. Ongkir dan fee dihitung admin
           saat konfirmasi total ke kamu.
         </p>
@@ -143,7 +150,7 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
 
       <section className="bagian" aria-labelledby="judul-tracking">
         <h2 id="judul-tracking">Tracking batch</h2>
-        <Timeline tracking={batch.tracking} statusSekarang={batch.status} tutup={tutup} />
+        <Timeline tracking={batch.tracking} statusSekarang={batch.status} negara={negara.kode} tutup={tutup} />
       </section>
 
       <p className="catatan-kecil">

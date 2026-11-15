@@ -1,5 +1,10 @@
-// Seed data awal ke Supabase. Jalankan: node --env-file=.env.local scripts/seed.mjs
+// Isi katalog A2O SOUL ke Supabase dan bersihkan batch sampel lama.
+// Jalankan: node --env-file=.env.local scripts/seed.mjs
 // Isinya disamakan dengan lib/katalog-cadangan.ts (jaga keduanya sinkron).
+//
+// Sebelum mengubah apa pun, isi tabel yang tersentuh disalin ke
+// backup/supabase-<waktu>.json (folder backup/ tidak ikut git).
+import { mkdirSync, writeFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 
 const url = process.env.SUPABASE_URL;
@@ -10,12 +15,22 @@ if (!url || !kunci || !url.startsWith("https://")) {
 }
 const sb = createClient(url, kunci, { auth: { persistSession: false } });
 
-async function cekGagal(salah, label) {
+function cekGagal(salah, label) {
   if (salah) {
     console.error(`Gagal ${label}:`, salah.message);
     process.exit(1);
   }
 }
+
+async function ambil(tabel) {
+  const { data, error } = await sb.from(tabel).select("*");
+  cekGagal(error, `membaca ${tabel}`);
+  return data ?? [];
+}
+
+// ---- Data A2O SOUL -------------------------------------------------------
+// harga_lokal 0 = harga belum diisi organizer (halaman menulis "Menyusul").
+// buka_po sama dengan tutup_po = tanggal buka belum dicatat (tidak ditampilkan).
 
 const negara = [
   { kode: "ID", nama: "Indonesia", mata_uang: "IDR", urutan: 1 },
@@ -26,133 +41,136 @@ const negara = [
 ];
 
 const komponen = [
-  { id: "id-photocard", country_kode: "ID", nama: "Photocard", deskripsi: "Split photocard yang ready di admin.", urutan: 1 },
-  { id: "th-album", country_kode: "TH", nama: "Album & Merch", deskripsi: "Album dan merch resmi dari toko Thailand.", urutan: 1 },
-  { id: "kr-album", country_kode: "KR", nama: "Album", deskripsi: "Album dari toko resmi Korea, termasuk po benefit.", urutan: 1 },
-  { id: "cn-album", country_kode: "CN", nama: "Album", deskripsi: "Album versi China dari platform resmi.", urutan: 1 },
-  { id: "jp-merch", country_kode: "JP", nama: "Merch", deskripsi: "Merch resmi dari Jepang.", urutan: 1 },
+  { id: "id-pc-a2o", country_kode: "ID", nama: "Photocard A2O SOUL", deskripsi: "Pooling photocard member A2O SOUL di admin.", urutan: 1 },
+  { id: "kr-album-pob-a2o", country_kode: "KR", nama: "Album & POB A2O SOUL", deskripsi: "Album A2O SOUL SUPERSTAR dengan POB toko Korea.", urutan: 1 },
+  { id: "kr-pob-a2o", country_kode: "KR", nama: "POB A2O SOUL", deskripsi: "POB A2O SOUL dari toko Korea.", urutan: 2 },
+  { id: "cn-pob-a2o", country_kode: "CN", nama: "POB A2O SOUL", deskripsi: "POB A2O SOUL dari toko China.", urutan: 1 },
+];
+
+const tanpaBiaya = { ongkir_lokal: 0, ongkir_internasional: 0, fee_organizer: 0, catatan: null };
+
+const superstar = [
+  ["MAKESTAR", "a2o-soul-superstar-makestar", "2026-11-28", 18],
+  ["APPLE MUSIC", "a2o-soul-superstar-apple-music", "2026-11-30", 14],
+  ["MUSICPLANT", "a2o-soul-superstar-musicplant", "2026-12-02", 12],
+  ["WITHMUU", "a2o-soul-superstar-withmuu", "2026-12-05", 22],
 ];
 
 const batches = [
+  ...superstar.map(([toko, slug, tutup]) => ({
+    id: slug,
+    component_id: "kr-album-pob-a2o",
+    nama: `A2O SOUL — Superstar (${toko} POB)`,
+    slug,
+    buka_po: tutup,
+    tutup_po: tutup,
+    kurs_go: 12,
+    status: "open",
+    ...tanpaBiaya,
+  })),
   {
-    id: "cn-album-batch-1", component_id: "cn-album", nama: "Album China Batch 1", slug: "cn-album-batch-1",
-    buka_po: "2026-09-25", tutup_po: "2026-10-10", kurs_go: 2450,
-    ongkir_lokal: 15000, ongkir_internasional: 25000, fee_organizer: 5000,
-    status: "open", catatan: "Rate GO fix di 1 CNY = Rp2.450 sampai batch ditutup.",
+    id: "photocard-member-a2o-soul-pooling",
+    component_id: "id-pc-a2o",
+    nama: "Photocard Member A2O SOUL (Pooling)",
+    slug: "photocard-member-a2o-soul-pooling",
+    buka_po: "2026-11-05",
+    tutup_po: "2026-11-05",
+    kurs_go: 1,
+    status: "arrived_admin",
+    ...tanpaBiaya,
   },
   {
-    id: "th-album-batch-2", component_id: "th-album", nama: "Album Thailand Batch 2", slug: "th-album-batch-2",
-    buka_po: "2026-09-28", tutup_po: "2026-10-15", kurs_go: 480,
-    ongkir_lokal: 18000, ongkir_internasional: 30000, fee_organizer: 5000,
-    status: "open", catatan: "Pengiriman dari Bangkok sekitar 3 minggu setelah batch ditutup.",
+    id: "pob-a2o-soul-superstar-pre-release",
+    component_id: "kr-pob-a2o",
+    nama: "POB A2O SOUL — Superstar Pre-Release",
+    slug: "pob-a2o-soul-superstar-pre-release",
+    buka_po: "2026-11-01",
+    tutup_po: "2026-11-01",
+    kurs_go: 12,
+    status: "arrived_wh_asal",
+    ...tanpaBiaya,
   },
   {
-    id: "th-merch-batch-1", component_id: "th-album", nama: "Merch Thailand Batch 1", slug: "th-merch-batch-1",
-    buka_po: "2026-08-10", tutup_po: "2026-08-25", kurs_go: 470,
-    ongkir_lokal: 18000, ongkir_internasional: 30000, fee_organizer: 5000,
-    status: "arrived_indonesia", catatan: null,
-  },
-  {
-    id: "kr-album-batch-5", component_id: "kr-album", nama: "Album Korea Batch 5", slug: "kr-album-batch-5",
-    buka_po: "2026-09-01", tutup_po: "2026-09-20", kurs_go: 12,
-    ongkir_lokal: 12000, ongkir_internasional: 28000, fee_organizer: 5000,
-    status: "arrived_wh_asal", catatan: null,
-  },
-  {
-    id: "jp-merch-batch-2", component_id: "jp-merch", nama: "Merch Jepang Batch 2", slug: "jp-merch-batch-2",
-    buka_po: "2026-08-05", tutup_po: "2026-08-30", kurs_go: 108,
-    ongkir_lokal: 16000, ongkir_internasional: 32000, fee_organizer: 5000,
-    status: "arrived_admin", catatan: null,
-  },
-  {
-    id: "id-photocard-smtr25", component_id: "id-photocard", nama: "Photocard SMTR25", slug: "photocard-smtr25",
-    buka_po: "2026-09-15", tutup_po: "2026-10-05", kurs_go: 1,
-    ongkir_lokal: 10000, ongkir_internasional: 0, fee_organizer: 5000,
-    status: "arrived_admin", catatan: "Barang udah arrived di admin, tinggal diambil atau dikirim.",
+    id: "pob-a2o-soul-china-exclusive",
+    component_id: "cn-pob-a2o",
+    nama: "POB A2O SOUL — China Exclusive",
+    slug: "pob-a2o-soul-china-exclusive",
+    buka_po: "2026-10-20",
+    tutup_po: "2026-10-20",
+    kurs_go: 2450,
+    status: "arrived_indonesia",
+    ...tanpaBiaya,
   },
 ];
 
 const items = [
-  { id: "cn-album-b1-s", batch_id: "cn-album-batch-1", nama: "Album ver. S", harga_lokal: 128, kuota: 20, terisi: 12, urutan: 1 },
-  { id: "cn-album-b1-w", batch_id: "cn-album-batch-1", nama: "Album ver. W", harga_lokal: 128, kuota: 20, terisi: 8, urutan: 2 },
-  { id: "th-album-b2-j", batch_id: "th-album-batch-2", nama: "Album TH ver. J", harga_lokal: 850, kuota: 15, terisi: 6, urutan: 1 },
-  { id: "th-album-b2-pc", batch_id: "th-album-batch-2", nama: "Official Photocard Set", harga_lokal: 320, kuota: 25, terisi: 18, urutan: 2 },
-  { id: "th-merch-b1-plush", batch_id: "th-merch-batch-1", nama: "Plush Doll 25cm", harga_lokal: 690, kuota: 10, terisi: 10, urutan: 1 },
-  { id: "th-merch-b1-tote", batch_id: "th-merch-batch-1", nama: "Tote Bag Limited", harga_lokal: 450, kuota: 15, terisi: 9, urutan: 2 },
-  { id: "kr-album-b5-rand", batch_id: "kr-album-batch-5", nama: "Album ver. Random", harga_lokal: 16800, kuota: 30, terisi: 27, urutan: 1 },
-  { id: "kr-album-b5-pob", batch_id: "kr-album-batch-5", nama: "POB Photocard", harga_lokal: 3500, kuota: 30, terisi: 21, urutan: 2 },
-  { id: "jp-merch-b2-mag", batch_id: "jp-merch-batch-2", nama: "Official Fan Magazine Vol. 9", harga_lokal: 2200, kuota: 12, terisi: 11, urutan: 1 },
-  { id: "jp-merch-b2-acs", batch_id: "jp-merch-batch-2", nama: "Acrylic Stand", harga_lokal: 1650, kuota: 12, terisi: 7, urutan: 2 },
-  { id: "id-pc-smtr25-slot", batch_id: "id-photocard-smtr25", nama: "Slot Photocard SMTR25", harga_lokal: 145000, kuota: 10, terisi: 4, urutan: 1 },
-  { id: "id-pc-smtr25-random", batch_id: "id-photocard-smtr25", nama: "Photocard Random", harga_lokal: 25000, kuota: 20, terisi: 13, urutan: 2 },
+  ...superstar.map(([toko, slug, , terisi]) => ({
+    id: `${slug}-album`,
+    batch_id: slug,
+    nama: `Album SUPERSTAR + POB ${toko}`,
+    harga_lokal: 0,
+    kuota: 40,
+    terisi,
+    urutan: 1,
+  })),
+  { id: "photocard-member-a2o-soul-slot", batch_id: "photocard-member-a2o-soul-pooling", nama: "Slot photocard member (pooling)", harga_lokal: 0, kuota: 30, terisi: 24, urutan: 1 },
+  { id: "pob-a2o-soul-pre-release", batch_id: "pob-a2o-soul-superstar-pre-release", nama: "POB Superstar Pre-Release", harga_lokal: 0, kuota: 40, terisi: 35, urutan: 1 },
+  { id: "pob-a2o-soul-china-exclusive", batch_id: "pob-a2o-soul-china-exclusive", nama: "POB China Exclusive", harga_lokal: 0, kuota: 30, terisi: 28, urutan: 1 },
 ];
 
-const tracking = [
-  { batch_id: "cn-album-batch-1", status: "open", catatan: "Batch dibuka, kuota 20 slot per versi.", tanggal: "2026-09-25" },
-  { batch_id: "cn-album-batch-1", status: "open", catatan: "Slot ver. S udah setengah terisi.", tanggal: "2026-10-01" },
-  { batch_id: "th-album-batch-2", status: "open", catatan: "Batch dibuka, rate fix 1 THB = Rp480.", tanggal: "2026-09-28" },
-  { batch_id: "th-merch-batch-1", status: "open", catatan: "Batch dibuka untuk merch limited.", tanggal: "2026-08-10" },
-  { batch_id: "th-merch-batch-1", status: "done_checkout", catatan: "Semua buyer udah checkout.", tanggal: "2026-08-25" },
-  { batch_id: "th-merch-batch-1", status: "arrived_wh_asal", catatan: "Barang sampai warehouse Bangkok.", tanggal: "2026-09-05" },
-  { batch_id: "th-merch-batch-1", status: "arrived_indonesia", catatan: "Sampai Jakarta, udah lewat bea cukai.", tanggal: "2026-10-01" },
-  { batch_id: "kr-album-batch-5", status: "open", catatan: "Batch dibuka, rate fix 1 KRW = Rp12.", tanggal: "2026-09-01" },
-  { batch_id: "kr-album-batch-5", status: "done_checkout", catatan: "Batch ditutup, 27/30 slot album terisi.", tanggal: "2026-09-20" },
-  { batch_id: "kr-album-batch-5", status: "arrived_wh_asal", catatan: "Barang lengkap sampai warehouse Korea dan udah dikirim.", tanggal: "2026-10-02" },
-  { batch_id: "jp-merch-batch-2", status: "open", catatan: "Batch dibuka untuk fan magazine vol. 9.", tanggal: "2026-08-05" },
-  { batch_id: "jp-merch-batch-2", status: "done_checkout", catatan: "Batch ditutup tepat waktu.", tanggal: "2026-08-30" },
-  { batch_id: "jp-merch-batch-2", status: "arrived_wh_asal", catatan: "Sampai warehouse Tokyo.", tanggal: "2026-09-12" },
-  { batch_id: "jp-merch-batch-2", status: "arrived_indonesia", catatan: "Tiba di Jakarta dan lolos bea cukai.", tanggal: "2026-10-01" },
-  { batch_id: "jp-merch-batch-2", status: "arrived_admin", catatan: "Sampai admin, lagi dibagi per buyer.", tanggal: "2026-10-03" },
-  { batch_id: "id-photocard-smtr25", status: "open", catatan: "Split dibuka, barang ready stock.", tanggal: "2026-09-15" },
-  { batch_id: "id-photocard-smtr25", status: "arrived_admin", catatan: "Photocard udah arrived di admin, siap dibagi.", tanggal: "2026-10-03" },
-];
+// ---- Batch sampel lama yang diganti ---------------------------------------
+const batchLama = ["cn-album-batch-1", "th-album-batch-2", "th-merch-batch-1", "kr-album-batch-5", "jp-merch-batch-2", "id-photocard-smtr25"];
+const komponenLama = ["id-photocard", "th-album", "kr-album", "cn-album", "jp-merch"];
+const orderDemo = "PF-CN-B1-7K3QD";
+const reviewSampel = ["Nayla", "Rara"];
 
-const reviews = [
-  { batch_id: "th-merch-batch-1", nama: "Nayla", bintang: 5, teks: "Plush doll-nya sampai dalam kondisi sempurna, dibungkus bubble wrap berlapis. Admin sabar jawab pertanyaan.", tanggal: "2026-09-30", tampil: true },
-  { batch_id: "kr-album-batch-5", nama: "Rara", bintang: 4, teks: "Update tracking-nya rajin, jadi nggak perlu nanya-nanya. Minus dikit di jadwal yang geser, tapi aman.", tanggal: "2026-10-01", tampil: true },
-];
-
-const order = {
-  kode: "PF-CN-B1-7K3QD",
-  buyer_username: "buyerperdana",
-  wa_last4: "1234",
-  batch_id: "cn-album-batch-1",
-  status: "menunggu_verifikasi",
-  total_rp: 359000,
-  catatan: null,
-  created_at: "2026-09-26T09:00:00Z",
-};
-
-await cekGagal((await sb.from("countries").upsert(negara)).error, "upsert countries");
-// Bersihkan baris lama yang sudah tidak terpakai (component dan batch GO Lokal lama).
-await sb.from("tracking_updates").delete().eq("batch_id", "id-lokal-batch-1");
-await sb.from("batch_items").delete().eq("batch_id", "id-lokal-batch-1");
-await sb.from("batches").delete().eq("id", "id-lokal-batch-1");
-await sb.from("components").delete().eq("id", "id-lokal");
-await cekGagal((await sb.from("components").upsert(komponen)).error, "upsert components");
-await cekGagal((await sb.from("batches").upsert(batches)).error, "upsert batches");
-await cekGagal((await sb.from("batch_items").upsert(items)).error, "upsert batch_items");
-
-await sb.from("tracking_updates").delete().in("batch_id", batches.map((b) => b.id));
-await cekGagal((await sb.from("tracking_updates").insert(tracking)).error, "insert tracking");
-
-const { data: reviewLama } = await sb.from("reviews").select("id").in("batch_id", batches.map((b) => b.id));
-if (reviewLama && reviewLama.length > 0) {
-  await sb.from("reviews").delete().in("id", reviewLama.map((r) => r.id));
+// ---- 1. Backup ------------------------------------------------------------
+const backup = {};
+for (const t of ["countries", "components", "batches", "batch_items", "tracking_updates", "orders", "order_items", "payments", "reviews"]) {
+  backup[t] = await ambil(t);
 }
-await cekGagal((await sb.from("reviews").insert(reviews)).error, "insert reviews");
+mkdirSync("backup", { recursive: true });
+const fileBackup = `backup/supabase-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+writeFileSync(fileBackup, JSON.stringify(backup, null, 2));
+console.log(`Backup tersimpan: ${fileBackup}`);
 
-const { data: orderLama } = await sb.from("orders").select("id").eq("kode", order.kode);
-if (orderLama && orderLama.length > 0) {
-  await sb.from("order_items").delete().in("order_id", orderLama.map((o) => o.id));
-  await sb.from("orders").delete().eq("kode", order.kode);
+// ---- 2. Pengaman: jangan hapus pesanan sungguhan -----------------------------
+const orderDiBatchLama = backup.orders.filter((o) => batchLama.includes(o.batch_id));
+const orderAsli = orderDiBatchLama.filter((o) => o.kode !== orderDemo);
+if (orderAsli.length > 0) {
+  console.error(`Berhenti: ada ${orderAsli.length} pesanan selain order demo di batch sampel. Tidak ada yang diubah.`);
+  process.exit(1);
 }
-const { data: dibuat, error: eOrder } = await sb.from("orders").insert(order).select("id").single();
-await cekGagal(eOrder, "insert orders");
-await cekGagal((await sb.from("order_items").insert({ item_id: "cn-album-b1-s", order_id: dibuat.id, qty: 1, harga_satuan_rp: 314000 })).error, "insert order_items");
 
-console.log("Seed selesai. Isi tabel:");
-for (const t of ["countries", "components", "batches", "batch_items", "tracking_updates", "orders", "order_items", "reviews", "profiles"]) {
+// ---- 3. Bersihkan batch sampel ------------------------------------------------
+const idOrderDemo = orderDiBatchLama.map((o) => o.id);
+if (idOrderDemo.length > 0) {
+  cekGagal((await sb.from("payments").delete().in("order_id", idOrderDemo)).error, "hapus payments demo");
+  cekGagal((await sb.from("order_items").delete().in("order_id", idOrderDemo)).error, "hapus order_items demo");
+  cekGagal((await sb.from("orders").delete().in("id", idOrderDemo)).error, "hapus order demo");
+}
+
+// Review sampel bawaan seed dihapus; review lain dari form (misalnya yang
+// disembunyikan admin) disimpan, hanya dilepas dari batch sampel.
+const reviewLama = backup.reviews.filter((r) => batchLama.includes(r.batch_id));
+const hapusReview = reviewLama.filter((r) => reviewSampel.includes(r.nama) && !r.profile_id).map((r) => r.id);
+const lepasReview = reviewLama.filter((r) => !hapusReview.includes(r.id)).map((r) => r.id);
+if (hapusReview.length > 0) cekGagal((await sb.from("reviews").delete().in("id", hapusReview)).error, "hapus review sampel");
+if (lepasReview.length > 0) cekGagal((await sb.from("reviews").update({ batch_id: null }).in("id", lepasReview)).error, "lepas review dari batch sampel");
+
+cekGagal((await sb.from("tracking_updates").delete().in("batch_id", batchLama)).error, "hapus tracking sampel");
+cekGagal((await sb.from("batch_items").delete().in("batch_id", batchLama)).error, "hapus item sampel");
+cekGagal((await sb.from("batches").delete().in("id", batchLama)).error, "hapus batch sampel");
+cekGagal((await sb.from("components").delete().in("id", komponenLama)).error, "hapus komponen sampel");
+
+// ---- 4. Isi katalog A2O SOUL ----------------------------------------------------
+cekGagal((await sb.from("countries").upsert(negara)).error, "upsert countries");
+cekGagal((await sb.from("components").upsert(komponen)).error, "upsert components");
+cekGagal((await sb.from("batches").upsert(batches)).error, "upsert batches");
+cekGagal((await sb.from("batch_items").upsert(items)).error, "upsert batch_items");
+
+console.log(`Seed selesai. Dihapus: ${batchLama.length} batch sampel, ${hapusReview.length} review sampel, ${idOrderDemo.length} order demo. Review dilepas dari batch sampel: ${lepasReview.length}.`);
+for (const t of ["countries", "components", "batches", "batch_items", "tracking_updates", "orders", "reviews"]) {
   const { count } = await sb.from(t).select("*", { count: "exact", head: true });
   console.log(`  ${t}: ${count ?? 0} baris`);
 }

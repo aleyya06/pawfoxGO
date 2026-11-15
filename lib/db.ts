@@ -395,6 +395,8 @@ export async function buatPesanan(input: {
   if (!batch) throw new Error("Batch tidak ditemukan");
   const item = batch.items.find((i) => i.id === input.itemId);
   if (!item) throw new Error("Item tidak ditemukan");
+  // Harga 0 berarti harga item belum diisi; jangan sampai tagihan Rp0 terbuat.
+  if (item.hargaLokal <= 0) throw new Error("Harga item belum diisi, isi dulu harga_lokal di batch_items");
   const info = katalog.lengkap(batch.id)!;
   const kode = `PF-${info.negara.kode}-${kodeAcak(6)}`;
   const hargaSatuan = hargaRupiah(item.hargaLokal, batch.kursGo);

@@ -52,7 +52,7 @@ Alasan: kanvas kertas + espresso memberi kontras tinggi ala editorial; terracott
 - Tepi kartu: `1px solid #E5DDD0`, tanpa bayangan, tanpa border bertumpuk atau garis putus-putus di dalam kartu. Satu-satunya garis putus-putus adalah sobekan tiket (motif). Kotak input tetap memakai tepi lebih gelap (~4:1) supaya kelihatan sebagai isian.
 - Bayangan: hanya untuk yang mengambang (kartu hero, navbar, menu seluler, modal).
 - Ruang: jarak antarseksi dibuat lega (beranda 96-112px di desktop), label kecil yang mengulang informasi dibuang.
-- Status: stempel Open hanya untuk batch yang tanggal tutupnya belum lewat. Batch Open yang lewat tenggat tampil "Closed" sampai admin memindahkan statusnya.
+- Status: stempel Open hanya untuk batch yang tanggal tutupnya belum lewat. Batch Open yang lewat tenggat tampil "Closed" sampai admin memindahkan statusnya. Tahap warehouse menyebut negara batch (Arrived WH Korea / China / Thailand / Jepang; batch lokal Indonesia: Arrived admin). Stempel selalu satu baris, 11px.
 - Glass: hanya navbar (satu elemen), karena konten lewat di bawahnya saat scroll.
 - Holo: gradien conic lilac-terracotta hanya di cincin emblem hero dan pojok kartu review. Alasan: meniru foil holo photocard.
 - Ikon: set SVG buatan sendiri dengan garis tebal 2.25 senada outline logo (pesawat, warehouse, kotak, rumah, menu, tutup, bintang, tautan luar). Tanpa Lucide.

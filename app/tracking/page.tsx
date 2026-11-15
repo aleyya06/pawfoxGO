@@ -81,7 +81,11 @@ export default async function HalamanTracking({ searchParams }: { searchParams: 
                   </p>
                   <h2 className="lacak-nama">{b.nama}</h2>
                 </div>
-                <RelPosisi status={b.status} tutup={b.status === "open" && !masihBuka(b, sekarang)} />
+                <RelPosisi
+                  status={b.status}
+                  negara={info.negara.kode}
+                  tutup={b.status === "open" && !masihBuka(b, sekarang)}
+                />
                 <div className="lacak-update">
                   {update ? (
                     <>

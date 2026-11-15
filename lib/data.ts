@@ -29,12 +29,32 @@ export const KONTAK = {
 };
 
 // Member A2O SOUL untuk pooling photocard. Satu tempat supaya gampang diubah.
-// Slot per member dibaca dari item batch bernama "POB Photocard · <Nama>",
-// jadi tag member hanya muncul di batch yang memang punya item itu.
-// Diisi organizer: nama persis seperti yang mau ditampilkan ke buyer.
-export const A2O_SOUL_MEMBERS: string[] = [];
+// Ejaan mengikuti rilis pers Oricon (debut SUPERSTAR, November 2026); sumber
+// lain menulis "Siwon" untuk See-One dan "Jet" untuk Zet.
+// Slot per member dibaca dari item batch bernama "POB Photocard · <Nama>".
+export const A2O_SOUL_MEMBERS: string[] = [
+  "Moon",
+  "Tai",
+  "Gaku",
+  "See-One",
+  "Seoha",
+  "Sono",
+  "Lucien",
+  "Zai",
+  "Ayden",
+  "Alure",
+  "Zet",
+  "Sora",
+  "Teo",
+  "June",
+  "Hansung",
+];
 
 export const AWALAN_ITEM_MEMBER = "POB Photocard · ";
+
+export function batchA2OSoul(namaBatch: string): boolean {
+  return /a2o soul/i.test(namaBatch);
+}
 
 export type StatusTracking =
   | "open"
@@ -46,13 +66,34 @@ export type StatusTracking =
 export const STATUS_TRACKING: { id: StatusTracking; label: string }[] = [
   { id: "open", label: "Open" },
   { id: "done_checkout", label: "Done checkout" },
-  { id: "arrived_wh_asal", label: "Arrived WH negara asal" },
+  // Label umum ini hanya untuk pilihan status di panel admin; halaman publik
+  // memakai labelStatusBatch() yang menyebut negaranya.
+  { id: "arrived_wh_asal", label: "Arrived WH luar negeri" },
   { id: "arrived_indonesia", label: "Arrived Indonesia" },
   { id: "arrived_admin", label: "Arrived admin" },
 ];
 
 export function labelStatus(status: StatusTracking): string {
   return STATUS_TRACKING.find((s) => s.id === status)?.label ?? status;
+}
+
+const NAMA_WAREHOUSE: Record<string, string> = {
+  KR: "Korea",
+  CN: "China",
+  TH: "Thailand",
+  JP: "Jepang",
+};
+
+// Label status untuk satu batch: tahap warehouse menyebut negara asal batch
+// (Arrived WH Korea, dst.). Batch lokal Indonesia tidak lewat warehouse luar
+// negeri, jadi tahap itu tampil sebagai Arrived admin.
+export function labelStatusBatch(status: StatusTracking, kodeNegara: string): string {
+  if (status === "arrived_wh_asal") {
+    if (kodeNegara === "ID") return "Arrived admin";
+    const nama = NAMA_WAREHOUSE[kodeNegara];
+    if (nama) return `Arrived WH ${nama}`;
+  }
+  return labelStatus(status);
 }
 
 export function urutanStatus(status: StatusTracking): number {
