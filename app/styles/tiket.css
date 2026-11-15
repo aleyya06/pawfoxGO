@@ -15,7 +15,7 @@
   gap: 8px;
   min-height: 44px;
   padding: 6px 10px 6px 12px;
-  border: 1.5px solid var(--garis-kuat);
+  border: 1px solid var(--garis-halus);
   border-radius: var(--r-tombol);
   background: var(--tiket);
   color: var(--espresso);
@@ -76,7 +76,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   background: var(--tiket);
-  border: 1.5px solid var(--espresso);
+  border: 1px solid var(--garis-halus);
   border-radius: var(--r-panel);
   box-shadow: var(--bayang-kertas);
 }
@@ -94,8 +94,10 @@
 .tiket-atas {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
   align-items: center;
   gap: 8px 10px;
+  width: 100%;
 }
 
 .tiket-negara {
@@ -128,21 +130,67 @@
   color: var(--tinta-terracotta);
 }
 
-.tiket-tutup {
+.tiket-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
   margin: 0;
-  padding: 3px 8px;
-  border-radius: var(--r-badge);
-  background: var(--sand);
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--teks-redup);
 }
 
-.tiket-tutup.lewat span {
-  color: var(--tinta-terracotta);
-}
-
-.tiket-stempel {
+/* Pooling photocard per member A2O SOUL */
+.pooling {
+  width: 100%;
   margin-top: 6px;
+}
+
+.pooling-judul {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.pooling-daftar {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pooling-daftar li {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--r-badge);
+  background: #efedfe;
+  color: var(--tinta-lilac);
+  font-size: 0.85rem;
+}
+
+.pooling-nama {
+  font-weight: 700;
+}
+
+.pooling-sisa {
+  font-size: 0.75rem;
+}
+
+.pooling-daftar li.penuh {
+  background: var(--sand);
+  color: var(--teks-redup);
+}
+
+.pooling-daftar li.penuh .pooling-nama {
+  text-decoration: line-through;
+}
+
+.halaman-batch .pooling {
+  margin-top: 28px;
 }
 
 /* Garis sobek dengan takik setengah lingkaran di kedua ujung.
@@ -152,7 +200,7 @@
   position: relative;
   z-index: 1;
   height: 0;
-  border-top: 2px dashed var(--sobek);
+  border-top: 1px dashed #d6ccbd;
   margin-inline: 14px;
 }
 
@@ -160,23 +208,23 @@
 .tiket-sobek::after {
   content: "";
   position: absolute;
-  top: calc(var(--takik) / -2 - 1px);
+  top: calc(var(--takik) / -2 - 0.5px);
   width: var(--takik);
   height: var(--takik);
   border-radius: 50%;
   background: var(--kertas);
-  border: 1.5px solid;
+  border: 1px solid;
 }
 
 .tiket-sobek::before {
-  left: calc(-14px - var(--takik) / 2 - 0.75px);
-  border-color: var(--espresso) var(--espresso) transparent transparent;
+  left: calc(-14px - var(--takik) / 2 - 0.5px);
+  border-color: var(--garis-halus) var(--garis-halus) transparent transparent;
   transform: rotate(45deg);
 }
 
 .tiket-sobek::after {
-  right: calc(-14px - var(--takik) / 2 - 0.75px);
-  border-color: transparent transparent var(--espresso) var(--espresso);
+  right: calc(-14px - var(--takik) / 2 - 0.5px);
+  border-color: transparent transparent var(--garis-halus) var(--garis-halus);
   transform: rotate(45deg);
 }
 
@@ -187,7 +235,7 @@
   gap: 10px;
   padding: 18px;
   background: var(--sand);
-  border-radius: 0 0 calc(var(--r-panel) - 1.5px) calc(var(--r-panel) - 1.5px);
+  border-radius: 0 0 calc(var(--r-panel) - 1px) calc(var(--r-panel) - 1px);
   min-width: 0;
 }
 
@@ -218,32 +266,32 @@
     width: 0;
     margin: 14px 0;
     border-top: 0;
-    border-left: 2px dashed var(--sobek);
+    border-left: 1px dashed #d6ccbd;
   }
 
   .tiket-sobek::before,
   .tiket-sobek::after {
-    left: calc(var(--takik) / -2 - 1px);
+    left: calc(var(--takik) / -2 - 0.5px);
     right: auto;
   }
 
   .tiket-sobek::before {
-    top: calc(-14px - var(--takik) / 2 - 0.75px);
-    border-color: transparent transparent var(--espresso) var(--espresso);
+    top: calc(-14px - var(--takik) / 2 - 0.5px);
+    border-color: transparent transparent var(--garis-halus) var(--garis-halus);
     transform: rotate(-45deg);
   }
 
   .tiket-sobek::after {
     top: auto;
-    bottom: calc(-14px - var(--takik) / 2 - 0.75px);
-    border-color: var(--espresso) var(--espresso) transparent transparent;
+    bottom: calc(-14px - var(--takik) / 2 - 0.5px);
+    border-color: var(--garis-halus) var(--garis-halus) transparent transparent;
     transform: rotate(-45deg);
   }
 
   .tiket-stub,
   .pass-stub {
     padding: 22px;
-    border-radius: 0 calc(var(--r-panel) - 1.5px) calc(var(--r-panel) - 1.5px) 0;
+    border-radius: 0 calc(var(--r-panel) - 1px) calc(var(--r-panel) - 1px) 0;
   }
 }
 
@@ -297,10 +345,9 @@
 }
 
 .bilah-slot-jalur {
-  height: 10px;
+  height: 8px;
   border-radius: 999px;
-  background: var(--tiket);
-  border: 1.5px solid var(--espresso);
+  background: #e2d8ca;
   overflow: hidden;
 }
 
@@ -317,7 +364,7 @@
   padding: 2px 8px;
   border-radius: var(--r-badge);
   background: var(--tiket);
-  border: 1.5px solid var(--garis-kuat);
+  border: 1px solid var(--garis-kuat);
   font-size: 0.85rem;
   font-weight: 700;
 }
@@ -451,7 +498,7 @@
   gap: 14px;
   padding: 18px;
   background: var(--tiket);
-  border: 1.5px solid var(--espresso);
+  border: 1px solid var(--garis-halus);
   border-radius: var(--r-panel);
   box-shadow: var(--bayang-kertas);
 }

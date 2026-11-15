@@ -5,12 +5,13 @@ import Bendera from "@/components/Bendera";
 import BilahSlot from "@/components/BilahSlot";
 import Countdown from "@/components/Countdown";
 import Ikon from "@/components/Ikon";
+import PoolingMember from "@/components/PoolingMember";
 import StempelStatus from "@/components/StempelStatus";
 import Timeline from "@/components/Timeline";
 import { MATA_UANG, hargaRupiah, totalSlot } from "@/lib/data";
 import { formatAngka, formatRupiah, formatTanggal } from "@/lib/format";
 import { batchLengkapBySlug } from "@/lib/db";
-import { IATA_ASAL, IATA_TUJUAN, batasTutup } from "@/lib/tampilan";
+import { IATA_ASAL, IATA_TUJUAN, masihBuka, slotMember } from "@/lib/tampilan";
 
 export const metadata: Metadata = { title: "Detail Batch" };
 export const dynamic = "force-dynamic";
@@ -22,8 +23,8 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
   const { batch, komponen, negara } = data;
   const slot = totalSlot(batch);
   const sisa = Math.max(0, slot.kuota - slot.terisi);
-  const lewat = batch.status === "open" && Date.now() > batasTutup(batch.tutupPo);
-  const masihBuka = batch.status === "open" && !lewat;
+  const buka = masihBuka(batch, Date.now());
+  const tutup = batch.status === "open" && !buka;
   const iata = IATA_ASAL[negara.kode];
 
   return (
@@ -37,23 +38,21 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
           <div className="tiket-atas">
             <span className="tiket-negara">
               <Bendera kode={negara.kode} />
-              <span className="mono">{negara.kode}</span>
-              <span>{negara.nama}</span>
+              {negara.nama}
             </span>
-            <span className="tag-koleksi">{komponen.nama}</span>
+            <StempelStatus status={batch.status} tutup={tutup} />
           </div>
           <h1 id="judul-batch" className="pass-nama">
             {batch.nama}
           </h1>
-          <p className="tiket-rute pass-rute mono">
-            {iata ? (
-              <>
+          <p className="tiket-meta">
+            <span className="tag-koleksi">{komponen.nama}</span>
+            {iata && (
+              <span className="tiket-rute mono">
                 {iata}
                 <Ikon nama="pesawat" className="tiket-rute-pesawat" />
                 {IATA_TUJUAN}
-              </>
-            ) : (
-              "Rute lokal"
+              </span>
             )}
           </p>
           <dl className="pass-data">
@@ -63,38 +62,36 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
             </div>
             <div>
               <dt>Tutup PO</dt>
-              <dd className={`mono${lewat ? " lewat" : ""}`}>
-                {formatTanggal(batch.tutupPo)}
-                {lewat && " · lewat"}
-              </dd>
+              <dd className="mono">{formatTanggal(batch.tutupPo)}</dd>
             </div>
             <div>
               <dt>Rate GO</dt>
               <dd className="mono">
-                {negara.mataUang === "IDR" ? "Harga langsung rupiah" : `1 ${negara.mataUang} = ${formatRupiah(batch.kursGo)}`}
+                {negara.mataUang === "IDR" ? "Rupiah langsung" : `1 ${negara.mataUang} = ${formatRupiah(batch.kursGo)}`}
               </dd>
             </div>
           </dl>
-          {masihBuka && <Countdown tutupPo={batch.tutupPo} />}
-          <StempelStatus status={batch.status} className="tiket-stempel" />
+          {buka && <Countdown tutupPo={batch.tutupPo} />}
         </div>
 
         <div className="tiket-sobek" aria-hidden="true" />
 
         <div className="pass-stub">
           <BilahSlot terisi={slot.terisi} kuota={slot.kuota} gerak={false} />
-          {masihBuka && (
+          {buka && (
             <p className={`sisa-slot${slot.kuota > 0 && sisa / slot.kuota <= 0.25 ? " mendesak" : ""}`}>
               {sisa > 0 ? `Sisa ${sisa} slot` : "Slot penuh"}
             </p>
           )}
           <p className="pass-catatan">
-            Rate GO fix selama batch jalan, beda dengan rate live di <Link href="/kalkulator">Kalkulator</Link>.
+            Rate GO tetap selama batch jalan, beda dengan rate live di <Link href="/kalkulator">Kalkulator</Link>.
           </p>
         </div>
       </article>
 
       {batch.catatan && <p className="note">{batch.catatan}</p>}
+
+      <PoolingMember member={slotMember(batch.items)} />
 
       <section className="bagian" aria-labelledby="judul-item">
         <h2 id="judul-item">Item &amp; harga</h2>
@@ -139,14 +136,14 @@ export default async function HalamanBatch({ params }: { params: Promise<{ slug:
           </table>
         </div>
         <p className="catatan-kecil">
-          Total slot <span className="mono">{slot.terisi}/{slot.kuota}</span>. Harga rupiah = harga lokal dikali rate
-          GO, dibulatkan ke atas ke Rp500 terdekat. Ongkir dan fee dihitung admin saat konfirmasi total ke kamu.
+          Harga rupiah = harga lokal dikali rate GO, dibulatkan ke atas ke Rp500 terdekat. Ongkir dan fee dihitung admin
+          saat konfirmasi total ke kamu.
         </p>
       </section>
 
       <section className="bagian" aria-labelledby="judul-tracking">
         <h2 id="judul-tracking">Tracking batch</h2>
-        <Timeline tracking={batch.tracking} statusSekarang={batch.status} />
+        <Timeline tracking={batch.tracking} statusSekarang={batch.status} tutup={tutup} />
       </section>
 
       <p className="catatan-kecil">

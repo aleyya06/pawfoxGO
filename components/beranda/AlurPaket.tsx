@@ -118,9 +118,7 @@ export default function AlurPaket() {
             className="alur-panel-isi"
           >
             <p className="alur-status mono">Status di tracking: {langkah.status}</p>
-            <h3 className="alur-panel-judul">
-              <span className="mono">{String(aktif + 1).padStart(2, "0")}.</span> {langkah.judul}
-            </h3>
+            <h3 className="alur-panel-judul">{langkah.judul}</h3>
             <p>{langkah.isi}</p>
             <p className="alur-jaminan">{langkah.jaminan}</p>
           </motion.div>

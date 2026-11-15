@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { formatRupiah } from "@/lib/format";
-import { IATA_TUJUAN, type TiketData } from "@/lib/tampilan";
+import type { TiketData } from "@/lib/tampilan";
 import BilahSlot from "./BilahSlot";
 import Bendera from "./Bendera";
-import Ikon from "./Ikon";
+import PoolingMember from "./PoolingMember";
 import StempelStatus from "./StempelStatus";
 
 // Kartu batch berbentuk boarding pass: badan kiri untuk identitas batch,
@@ -21,31 +21,21 @@ export default function TiketBatch({ t, judulTag = "h3" }: { t: TiketData; judul
         <div className="tiket-atas">
           <span className="tiket-negara">
             <Bendera kode={t.negaraKode} />
-            <span className="mono">{t.negaraKode}</span>
-            <span>{t.negaraNama}</span>
+            {t.negaraNama}
           </span>
-          <span className="tag-koleksi">{t.komponen}</span>
+          <StempelStatus status={t.status} tutup={t.lewat} />
         </div>
         <Judul id={`tiket-${t.id}`} className="tiket-nama">
           {t.nama}
         </Judul>
-        <p className="tiket-rute mono">
-          {t.iata ? (
-            <>
-              {t.iata}
-              <Ikon nama="pesawat" className="tiket-rute-pesawat" />
-              {IATA_TUJUAN}
-            </>
-          ) : (
-            "Rute lokal"
-          )}
+        <p className="tiket-meta">
+          <span className="tag-koleksi">{t.komponen}</span>
+          <span className="mono">
+            Tutup {t.tutupLabel}
+            {masihBuka && t.sisaHari !== null && ` · ${t.sisaHari} hari lagi`}
+          </span>
         </p>
-        <p className={`tiket-tutup mono${t.lewat ? " lewat" : ""}`}>
-          Tutup: {t.tutupLabel}
-          {t.lewat && <span> · lewat</span>}
-          {masihBuka && t.sisaHari !== null && <span> · {t.sisaHari} hari lagi</span>}
-        </p>
-        <StempelStatus status={t.status} className="tiket-stempel" />
+        <PoolingMember member={t.member} />
       </div>
 
       <div className="tiket-sobek" aria-hidden="true" />

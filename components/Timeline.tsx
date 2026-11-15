@@ -5,7 +5,15 @@ import PawIkon from "./PawIkon";
 // Timeline lengkap di halaman batch: lima stop sebaris di desktop dengan
 // catatan di bawah tiap stop, stepper tegak di mobile. Bullet paw terisi
 // berarti status sudah terlewati.
-export default function Timeline({ tracking, statusSekarang }: { tracking: UpdateTracking[]; statusSekarang: StatusTracking }) {
+export default function Timeline({
+  tracking,
+  statusSekarang,
+  tutup = false,
+}: {
+  tracking: UpdateTracking[];
+  statusSekarang: StatusTracking;
+  tutup?: boolean;
+}) {
   const posisi = urutanStatus(statusSekarang);
 
   return (
@@ -26,7 +34,11 @@ export default function Timeline({ tracking, statusSekarang }: { tracking: Updat
             <div className="timeline-isi">
               <p className="timeline-label">
                 {label}
-                {sekarang && <span className="timeline-sekarang mono">Posisi sekarang</span>}
+                {sekarang && (
+                  <span className="timeline-sekarang mono">
+                    {id === "open" && tutup ? "PO sudah ditutup" : "Posisi sekarang"}
+                  </span>
+                )}
                 {!tercapai && <span className="sr-only"> (belum)</span>}
               </p>
               {updates.map((u, j) => (

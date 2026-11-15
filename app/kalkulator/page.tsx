@@ -6,17 +6,18 @@ import RateLiveSingkat from "@/components/RateLiveSingkat";
 import { KONTAK } from "@/lib/data";
 import { formatRupiah } from "@/lib/format";
 import { muatKatalog } from "@/lib/db";
-import { negaraBatch } from "@/lib/tampilan";
+import { masihBuka, negaraBatch } from "@/lib/tampilan";
 
-export const metadata: Metadata = { title: "Kalkulator Rate" };
+export const metadata: Metadata = { title: "Kalkulator Kurs" };
 export const dynamic = "force-dynamic";
 
 export default async function HalamanKalkulator() {
   // Kalkulator tetap jalan walau katalog gagal dimuat; daftar rate GO saja yang kosong.
   const katalog = await muatKatalog().catch(() => null);
+  const sekarang = Date.now();
   const buka = katalog
     ? katalog.batchList
-        .filter((b) => b.status === "open")
+        .filter((b) => masihBuka(b, sekarang))
         .map((b) => ({ batch: b, negara: katalog.negaraList.find((n) => n.kode === negaraBatch(katalog, b)) }))
         .filter((x) => x.negara && x.negara.mataUang !== "IDR")
     : [];
@@ -24,21 +25,20 @@ export default async function HalamanKalkulator() {
   return (
     <div className="wadah halaman">
       <header className="kepala-halaman">
-        <h1>Kalkulator Rate</h1>
+        <h1>Kalkulator Kurs</h1>
         <p className="bagian-pengantar">
-          Konversi Baht, Won, Yuan, dan Yen ke rupiah (dan sebaliknya) dengan rate live, lalu bandingkan dengan rate GO
+          Konversi Won, Yuan, Baht, dan Yen ke rupiah (dan sebaliknya) dengan rate live, lalu bandingkan dengan rate GO
           batch yang lagi buka.
         </p>
       </header>
 
       <div className="kalkulator-grid">
-        <KalkulatorKurs />
+        <KalkulatorKurs judul={false} />
 
         <section className="rate-go" aria-labelledby="judul-kurs-go">
           <h2 id="judul-kurs-go">Rate GO batch yang lagi buka</h2>
           <p className="catatan-kecil">
-            Rate live berganti tiap hari dan cuma buat gambaran cepat. Tagihanmu selalu dihitung pakai rate GO batch,
-            yang dikunci sejak batch dibuka.
+            Rate live berganti tiap hari. Tagihanmu selalu dihitung pakai rate GO batch, yang dikunci sejak batch dibuka.
           </p>
           {katalog === null ? (
             <p className="kosong">Katalog batch gagal dimuat, jadi rate GO belum bisa ditampilkan. Coba muat ulang halaman.</p>

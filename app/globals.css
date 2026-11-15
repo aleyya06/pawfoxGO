@@ -18,6 +18,8 @@
   --teks-redup-gelap: #c9beb3;
 
   --garis: rgba(24, 20, 18, 0.14);
+  /* Tepi kartu: tipis dan hangat supaya kartu tetap rapi tanpa terasa berat. */
+  --garis-halus: #e5ddd0;
   /* Tepi input dan chip: 0.55 memberi ~4:1 di kertas, di atas syarat 3:1 non-teks. */
   --garis-kuat: rgba(24, 20, 18, 0.55);
   --sobek: rgba(24, 20, 18, 0.35);
@@ -27,9 +29,10 @@
   --r-badge: 6px;
   --r-stempel: 4px;
 
-  /* Bayangan keras 3px = kertas bertumpuk; angkat = hanya kartu hero. */
-  --bayang-kertas: 0 3px 0 var(--espresso);
-  --bayang-angkat: 0 30px 60px -28px rgba(24, 20, 18, 0.45), 0 3px 0 var(--espresso);
+  /* Kartu datar; bayangan lembut hanya untuk elemen yang mengambang
+     (kartu hero, navbar, menu, modal). */
+  --bayang-kertas: none;
+  --bayang-angkat: 0 30px 60px -30px rgba(24, 20, 18, 0.35), 0 1px 2px rgba(24, 20, 18, 0.06);
 
   --font-isi: var(--font-jakarta), "Segoe UI", system-ui, sans-serif;
   --font-kode: var(--font-mono), ui-monospace, "Cascadia Mono", monospace;
@@ -322,24 +325,24 @@ img {
 /* Permukaan */
 .kartu {
   background: var(--tiket);
-  border: 1.5px solid var(--garis-kuat);
+  border: 1px solid var(--garis-halus);
   border-radius: var(--r-panel);
-  padding: 20px;
+  padding: 22px;
 }
 
 .note {
   background: var(--sand);
-  border: 1.5px solid var(--garis);
   border-radius: var(--r-tombol);
-  padding: 12px 16px;
+  padding: 14px 18px;
   font-size: 0.95rem;
   margin: 0 0 16px;
 }
 
 .kosong {
-  border: 2px dashed var(--garis-kuat);
+  background: var(--tiket);
+  border: 1px solid var(--garis-halus);
   border-radius: var(--r-panel);
-  padding: 28px 22px;
+  padding: 32px 22px;
   text-align: center;
   color: var(--teks-redup);
   margin: 0;
@@ -366,7 +369,7 @@ img {
 
 /* Struktur seksi */
 .bagian {
-  padding-block: 36px 8px;
+  padding-block: 48px 8px;
 }
 
 .bagian-pengantar {
@@ -375,7 +378,7 @@ img {
 }
 
 .kepala-bagian {
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .kepala-bagian h2 {
@@ -393,7 +396,7 @@ img {
 }
 
 .kepala-halaman {
-  margin-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .remah {
@@ -404,7 +407,7 @@ img {
 /* Tabel */
 .tabel-gulir {
   overflow-x: auto;
-  border: 1.5px solid var(--espresso);
+  border: 1px solid var(--garis-halus);
   border-radius: var(--r-panel);
   background: var(--tiket);
 }
@@ -697,7 +700,7 @@ th.angka {
   gap: 14px;
   padding: 14px;
   background: var(--kertas);
-  border: 1.5px solid var(--espresso);
+  border: 1px solid var(--garis-halus);
   border-radius: 20px;
   box-shadow: var(--bayang-angkat);
 }
@@ -924,7 +927,7 @@ th.angka {
   max-width: 400px;
   padding: 28px 24px 24px;
   background: var(--tiket);
-  border: 1.5px solid var(--espresso);
+  border: 1px solid var(--garis-halus);
   border-radius: var(--r-panel);
   box-shadow: var(--bayang-angkat);
 }
@@ -1065,7 +1068,7 @@ th.angka {
 }
 
 .daftar-profil {
-  border: 1.5px solid var(--espresso);
+  border: 1px solid var(--garis-halus);
   border-radius: var(--r-panel);
   overflow: hidden;
   display: grid;

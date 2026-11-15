@@ -3,7 +3,7 @@ import StripNegara, { SEMUA } from "@/components/StripNegara";
 import TiketBatch from "@/components/TiketBatch";
 import { KONTAK } from "@/lib/data";
 import { muatKatalog } from "@/lib/db";
-import { keTiket, negaraBatch } from "@/lib/tampilan";
+import { keTiket, masihBuka, negaraBatch } from "@/lib/tampilan";
 
 export const metadata: Metadata = { title: "PO & Batch" };
 export const dynamic = "force-dynamic";
@@ -25,11 +25,13 @@ export default async function HalamanPO({ searchParams }: { searchParams: Promis
   const aktif = negaraAktif?.kode ?? SEMUA;
   const sekarang = Date.now();
 
-  // Batch yang masih buka di depan, sisanya urut tanggal tutup terbaru.
+  // Batch yang masih buka di depan (tutup paling dekat dulu), sisanya urut
+  // tanggal tutup terbaru.
   const semua = [...katalog.batchList].sort((a, b) => {
-    const bukaA = a.status === "open" ? 0 : 1;
-    const bukaB = b.status === "open" ? 0 : 1;
-    return bukaA - bukaB || b.tutupPo.localeCompare(a.tutupPo);
+    const bukaA = masihBuka(a, sekarang);
+    const bukaB = masihBuka(b, sekarang);
+    if (bukaA !== bukaB) return bukaA ? -1 : 1;
+    return bukaA ? a.tutupPo.localeCompare(b.tutupPo) : b.tutupPo.localeCompare(a.tutupPo);
   });
   const tampil = negaraAktif ? semua.filter((b) => negaraBatch(katalog, b) === negaraAktif.kode) : semua;
 
@@ -46,10 +48,7 @@ export default async function HalamanPO({ searchParams }: { searchParams: Promis
     <div className="wadah halaman">
       <header className="kepala-halaman">
         <h1>PO &amp; Batch</h1>
-        <p className="bagian-pengantar">
-          Semua batch per negara, yang masih buka di paling depan. Tiap tiket mencatat rate GO, slot, dan tanggal tutup
-          batchnya.
-        </p>
+        <p className="bagian-pengantar">Semua batch per negara. Yang masih buka ada di paling depan.</p>
       </header>
 
       <StripNegara

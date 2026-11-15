@@ -2,7 +2,7 @@
 
 import { LayoutGroup, motion } from "framer-motion";
 import { useId, useMemo, useState } from "react";
-import { MATA_UANG, MATA_UANG_LUAR, type KodeMataUang } from "@/lib/data";
+import { MATA_UANG, type KodeMataUang } from "@/lib/data";
 import { formatAngka, formatRate, formatRupiah } from "@/lib/format";
 import { useKursLive } from "@/lib/kurs-live";
 import Bendera from "./Bendera";
@@ -10,15 +10,8 @@ import Ikon from "./Ikon";
 
 const NEGARA_MATA_UANG: Record<string, string> = { THB: "TH", KRW: "KR", CNY: "CN", JPY: "JP" };
 
-// Contoh harga dari organizer, ditandai "contoh" di UI. Menukar arah
-// menerbangkan tag IDR dan tag mata uang asing ke kotak seberang, supaya
-// jelas angka mana yang sekarang diketik.
-const PRESET: { label: string; jumlah: number; kode: KodeMataUang }[] = [
-  { label: "Photocard", jumlah: 150, kode: "CNY" },
-  { label: "Album", jumlah: 550, kode: "THB" },
-  { label: "Lightstick", jumlah: 45000, kode: "KRW" },
-  { label: "Merch", jumlah: 3500, kode: "JPY" },
-];
+// Won di depan karena sebagian besar batch berasal dari Korea.
+const URUTAN_PILIHAN: KodeMataUang[] = ["KRW", "CNY", "THB", "JPY"];
 
 function parseJumlah(teks: string): number {
   const bersih = teks.replace(/\s/g, "").replace(",", ".");
@@ -26,6 +19,8 @@ function parseJumlah(teks: string): number {
   return Number.isFinite(n) && n >= 0 ? n : 0;
 }
 
+// Menukar arah menerbangkan tag IDR dan tag mata uang asing ke kotak
+// seberang, supaya jelas angka mana yang sekarang diketik.
 function TagMataUang({ kode, idr }: { kode: KodeMataUang; idr: boolean }) {
   return (
     <motion.span layoutId={idr ? "tag-idr" : "tag-asing"} className="slip-tag mono" transition={{ type: "spring", stiffness: 380, damping: 30 }}>
@@ -34,9 +29,9 @@ function TagMataUang({ kode, idr }: { kode: KodeMataUang; idr: boolean }) {
   );
 }
 
-export default function KalkulatorKurs({ ringkas = false }: { ringkas?: boolean }) {
-  const [jumlahTeks, setJumlahTeks] = useState("10");
-  const [kode, setKode] = useState<KodeMataUang>("CNY");
+export default function KalkulatorKurs({ ringkas = false, judul = true }: { ringkas?: boolean; judul?: boolean }) {
+  const [jumlahTeks, setJumlahTeks] = useState("10000");
+  const [kode, setKode] = useState<KodeMataUang>("KRW");
   const [arah, setArah] = useState<"ke_idr" | "dari_idr">("ke_idr");
   const kurs = useKursLive();
   const id = useId();
@@ -51,46 +46,10 @@ export default function KalkulatorKurs({ ringkas = false }: { ringkas?: boolean 
 
   return (
     <div className="slip">
-      <div className="slip-kepala">
-        <p className="slip-judul">Slip hitung</p>
-        <p className="slip-sumber mono">
-          {kurs.sumber === "live" && `rate live · ${kurs.waktu}`}
-          {kurs.sumber === "cadangan" && "rate cadangan"}
-          {kurs.sumber === "memuat" && "memuat rate"}
-        </p>
-      </div>
-
-      <div className="slip-preset" role="group" aria-labelledby={`${id}-preset`}>
-        <span id={`${id}-preset`} className="slip-label">
-          Contoh harga
-        </span>
-        <div className="slip-preset-daftar">
-          {PRESET.map((p) => {
-            const terpilih = keIdr && kode === p.kode && jumlah === p.jumlah;
-            return (
-              <button
-                key={p.label}
-                type="button"
-                className="slip-preset-tombol"
-                aria-pressed={terpilih}
-                onClick={() => {
-                  setJumlahTeks(String(p.jumlah));
-                  setKode(p.kode);
-                  setArah("ke_idr");
-                }}
-              >
-                <span>{p.label}</span>
-                <span className="mono">
-                  ~{formatAngka(p.jumlah)} {p.kode}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      {judul && <p className="slip-judul">Kalkulator Kurs</p>}
 
       <div className="slip-mata-uang" role="group" aria-label="Mata uang asing">
-        {MATA_UANG_LUAR.map((k) => (
+        {URUTAN_PILIHAN.map((k) => (
           <button key={k} type="button" className="slip-mu" aria-pressed={kode === k} onClick={() => setKode(k)}>
             <Bendera kode={NEGARA_MATA_UANG[k]} />
             <span className="mono">{k}</span>
@@ -114,7 +73,7 @@ export default function KalkulatorKurs({ ringkas = false }: { ringkas?: boolean 
                 autoComplete="off"
                 value={jumlahTeks}
                 onChange={(e) => setJumlahTeks(e.target.value)}
-                placeholder="10"
+                placeholder="10000"
               />
               <TagMataUang key={keIdr ? "asing" : "idr"} kode={kode} idr={!keIdr} />
             </div>
@@ -153,19 +112,16 @@ export default function KalkulatorKurs({ ringkas = false }: { ringkas?: boolean 
 
       {rate && kurs.sumber !== "memuat" && (
         <p className="slip-rumus mono">
-          {keIdr
-            ? `1 ${kode} = ${formatRate(rate)} · ${formatAngka(jumlah)} ${kode}`
-            : `Rp1 = ${formatAngka(Math.round((1 / rate) * 10000) / 10000)} ${kode} · ${formatRupiah(jumlah)}`}
+          {keIdr ? `1 ${kode} = ${formatRate(rate)}` : `Rp1 = ${formatAngka(Math.round((1 / rate) * 10000) / 10000)} ${kode}`}
+          {kurs.sumber === "live" && ` · rate live ${kurs.waktu}`}
         </p>
       )}
 
-      <div className="slip-sobek" aria-hidden="true" />
-
       <p className={`slip-catatan${kurs.sumber === "cadangan" ? " gagal" : ""}`} role="status">
-        {kurs.sumber === "live" && `Rate live dari open.er-api.com, diperbarui ${kurs.waktu}. `}
-        {kurs.sumber === "cadangan" &&
-          "Rate live gagal diambil, jadi yang terpakai rate cadangan kasar. Angkanya bisa beda dari kurs yang jalan sekarang. "}
-        Ini estimasi rate pasar. Harga di tiap batch pakai rate GO yang dikunci saat batch dibuka, jadi angkanya bisa beda.
+        {kurs.sumber === "cadangan"
+          ? "Rate live gagal diambil, jadi yang terpakai rate cadangan kasar. Angkanya bisa beda dari kurs yang jalan sekarang. "
+          : "Rate pasar live dari open.er-api.com. "}
+        Tagihan batch pakai rate GO yang dikunci saat batch dibuka, jadi angkanya bisa beda.
       </p>
 
       {!ringkas && (
@@ -181,7 +137,7 @@ export default function KalkulatorKurs({ ringkas = false }: { ringkas?: boolean 
               </tr>
             </thead>
             <tbody>
-              {MATA_UANG_LUAR.map((k) => (
+              {URUTAN_PILIHAN.map((k) => (
                 <tr key={k}>
                   <td>
                     <span className="sel-mata-uang">

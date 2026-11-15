@@ -2,7 +2,7 @@
 
 Website group order K-pop personal: katalog PO per negara (Thailand, Indonesia, Korea, China, Jepang), kalkulator kurs, tracking batch, cek pesanan tanpa login, dan review buyer.
 
-Dibangun dengan Next.js + TypeScript. Data dikelola lewat satu file: `lib/data.ts`.
+Dibangun dengan Next.js + TypeScript. Data katalog, tracking, review, dan tagihan tersimpan di Supabase.
 
 ## Jalanin di lokal
 
@@ -15,12 +15,15 @@ Buka http://localhost:3000. Untuk versi produksi: `npm run build` lalu `npm star
 
 ## Cara ganti data
 
-Semua data ada di `lib/data.ts` dan datanya sekarang masih contoh berlabel, tinggal diganti:
+Data harian diubah lewat Supabase Table Editor atau panel `/admin`:
 
-- `NEGARA` dan `KOMPONEN`: negara beserta komponennya (album, merch, dan lain-lain).
-- `BATCH`: tiap batch punya tanggal buka/tutup PO, kurs GO, rincian biaya per slot (ongkir lokal, ongkir internasional, fee), `items` (nama, harga lokal, kuota, terisi), dan `tracking` (status + catatan + tanggal).
-- `STATUS_TRACKING`: daftar 10 status tracking, urut dari PO dibuka sampai selesai. Status batch = posisi sekarang.
-- `BUYER`, `PESANAN`, `REVIEW`: data buat halaman Cek Pesanan dan review. `PESANAN.kode` harus unik (dipakai buyer buat cari), `BUYER.empatDigitWa` dipakai verifikasi ringan di halaman cek pesanan.
+- `countries` dan `components`: negara beserta kategorinya (album, POB, photocard).
+- `batches`: tanggal buka/tutup PO, rate GO, status. Batch berstatus Open yang tanggal tutupnya sudah lewat otomatis tampil sebagai "Closed" sampai statusnya dipindah.
+- `batch_items`: item per batch (nama, harga lokal, kuota, terisi). Item bernama `POB Photocard · <Nama Member>` tampil sebagai slot pooling per member, asalkan namanya ada di `A2O_SOUL_MEMBERS` (`lib/data.ts`).
+- `tracking_updates`: riwayat status batch (status + catatan + tanggal). Urutan status ada di `STATUS_TRACKING` (`lib/data.ts`).
+- `reviews`: review dari form beranda, tampil setelah admin menyalakan `tampil`.
+
+`scripts/seed.mjs` mengisi katalog awal ke Supabase, dan `lib/katalog-cadangan.ts` dipakai kalau Supabase tidak terjangkau. Isi keduanya dijaga sama.
 
 Kurs GO per batch dipakai menghitung harga rupiah (dibulatkan ke atas ke Rp500 terdekat). Kurs live di kalkulator otomatis dari open.er-api.com, cache 12 jam di browser buyer, dan ada kurs cadangan di `KURS_CADANGAN` kalau API-nya gagal.
 

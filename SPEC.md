@@ -52,8 +52,8 @@ Status tracking batch (urut, konsisten, dipakai di seluruh UI):
 - Kalkulator kurs: widget, pilih THB/KRW/CNY/JPY, ketik angka, keluar rupiah; ada mode kebalik (IDR ke mata uang lain). Sumber: kurs live (referensi) dan kurs GO batch terkait.
 - Halaman tracking per batch: timeline status (desktop horizontal, mobile stepper vertikal), tiap perpindahan status punya catatan, foto opsional, dan tanggal "update terakhir".
 - Admin dulu cukup lewat Supabase Studio, panel dibikin di Fase 2.
-- **Cek Pesanan** (`/cek-pesanan`, struktur sudah terbangun): satu search bar menerima kode order (detail penuh: item, status bayar, total, link tracking) atau username (daftar ringkas; detail sensitif terbuka setelah verifikasi 4 digit terakhir nomor WA). Data order/buyer sekarang contoh berlabel di `lib/data.ts`, pindah ke Supabase di Fase 2.
-- **Review buyer** (terbangun): kartu review berbintang di halaman batch, plus petunjuk cara buyer kirim review lewat DM. Data contoh berlabel di `lib/data.ts`.
+- **Cek Pesanan** (`/cek-pesanan`, struktur sudah terbangun): satu search bar menerima kode order (detail penuh: item, status bayar, total, link tracking) atau username (daftar ringkas; detail sensitif terbuka setelah verifikasi 4 digit terakhir nomor WA). Data order/buyer sudah pindah ke Supabase di Fase 2.
+- **Review buyer** (terbangun): kartu review berbintang di halaman batch, plus petunjuk cara buyer kirim review lewat DM. Review sekarang tersimpan di Supabase dan tampil setelah dicek admin.
 
 ### Fase 2: database Supabase, login LINE, tagihan (disiapkan, lihat `docs/PANDUAN-FASE2.md`)
 

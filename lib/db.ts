@@ -185,7 +185,7 @@ export async function muatKatalog(): Promise<Katalog> {
 
     return rangkaiKatalog(negaraList, komponenList, batchList);
   } catch (galatAsli) {
-    // Supabase gagal dihubungi: tampilkan katalog contoh supaya halaman
+    // Supabase gagal dihubungi: tampilkan katalog cadangan supaya halaman
     // publik tetap utuh. Bukan kondisi normal; perbaiki koneksi di .env.local.
     globalKunci.__pawfoxGagalSampai = Date.now() + JEDA_GAGAL_MS;
     console.error("Supabase tidak terjangkau, memakai katalog cadangan:", galatAsli instanceof Error ? galatAsli.message : galatAsli);

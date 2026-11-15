@@ -45,10 +45,14 @@ Alasan: kanvas kertas + espresso memberi kontras tinggi ala editorial; terracott
 
 ## Bentuk & komponen
 
-- Motif identitas: tiket/air waybill. Kartu batch berbentuk boarding pass dengan takik dan garis sobek, stub kanan berisi slot, rate, dan tombol. Kode rute mono berulang di hero, tiket, dan detail batch.
+- Motif identitas: tiket/air waybill. Kartu batch berbentuk boarding pass dengan takik dan garis sobek, stub kanan berisi slot, rate, dan tombol. Kode rute mono di hero dan detail batch.
+- Pooling photocard: tag per member A2O SOUL (lilac) di tiket dan detail batch, dari item `POB Photocard · <Nama>`.
 - Paw dari logo tetap hidup sebagai bullet timeline tracking (paw terisi = status terlewati).
 - Radius: tiket dan panel 14px, tombol 10px, chip filter 10px, badge 6px, stempel 4px. Pill hanya untuk navbar mengambang dan CTA di dalamnya.
-- Bayangan: tiket memakai bayangan keras 2px (kertas bertumpuk). Bayangan lembut hanya untuk kartu hero (elemen paling depan) dan navbar mengambang.
+- Tepi kartu: `1px solid #E5DDD0`, tanpa bayangan, tanpa border bertumpuk atau garis putus-putus di dalam kartu. Satu-satunya garis putus-putus adalah sobekan tiket (motif). Kotak input tetap memakai tepi lebih gelap (~4:1) supaya kelihatan sebagai isian.
+- Bayangan: hanya untuk yang mengambang (kartu hero, navbar, menu seluler, modal).
+- Ruang: jarak antarseksi dibuat lega (beranda 96-112px di desktop), label kecil yang mengulang informasi dibuang.
+- Status: stempel Open hanya untuk batch yang tanggal tutupnya belum lewat. Batch Open yang lewat tenggat tampil "Closed" sampai admin memindahkan statusnya.
 - Glass: hanya navbar (satu elemen), karena konten lewat di bawahnya saat scroll.
 - Holo: gradien conic lilac-terracotta hanya di cincin emblem hero dan pojok kartu review. Alasan: meniru foil holo photocard.
 - Ikon: set SVG buatan sendiri dengan garis tebal 2.25 senada outline logo (pesawat, warehouse, kotak, rumah, menu, tutup, bintang, tautan luar). Tanpa Lucide.

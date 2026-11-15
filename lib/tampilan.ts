@@ -1,7 +1,16 @@
 // Bentuk data siap tampil untuk tiket batch, hero, dan tracking. Dihitung di
 // server (halaman force-dynamic) supaya "tanggal tutup lewat" dan sisa hari
 // tidak berbeda antara server dan browser saat hydration.
-import { labelStatus, totalSlot, type Batch, type KodeMataUang, type StatusTracking } from "./data";
+import {
+  A2O_SOUL_MEMBERS,
+  AWALAN_ITEM_MEMBER,
+  labelStatus,
+  totalSlot,
+  type Batch,
+  type ItemBatch,
+  type KodeMataUang,
+  type StatusTracking,
+} from "./data";
 import { formatTanggal } from "./format";
 import type { Katalog } from "./db";
 
@@ -15,6 +24,21 @@ export const IATA_ASAL: Record<string, string> = {
   JP: "NRT",
 };
 export const IATA_TUJUAN = "CGK";
+
+export interface SlotMember {
+  nama: string;
+  terisi: number;
+  kuota: number;
+}
+
+// Slot photocard per member dari item "POB Photocard · <Nama>", urut sesuai
+// A2O_SOUL_MEMBERS. Item yang namanya bukan member terdaftar diabaikan.
+export function slotMember(items: ItemBatch[]): SlotMember[] {
+  return A2O_SOUL_MEMBERS.flatMap((nama) => {
+    const item = items.find((i) => i.nama.toLowerCase() === `${AWALAN_ITEM_MEMBER}${nama}`.toLowerCase());
+    return item ? [{ nama, terisi: item.terisi, kuota: item.kuota }] : [];
+  });
+}
 
 export interface TiketData {
   id: string;
@@ -33,11 +57,19 @@ export interface TiketData {
   terisi: number;
   kuota: number;
   iata: string | null;
+  member: SlotMember[];
 }
 
 // PO ditutup di akhir hari tanggal tutup, waktu Indonesia barat.
 export function batasTutup(tutupPo: string): number {
   return new Date(`${tutupPo}T23:59:59+07:00`).getTime();
+}
+
+// Batch dianggap buka hanya kalau statusnya Open DAN tanggal tutupnya belum
+// lewat. Status Open yang lewat tenggat tampil sebagai "Closed" sampai admin
+// memindahkannya ke status berikutnya.
+export function masihBuka(batch: Batch, sekarang: number): boolean {
+  return batch.status === "open" && sekarang <= batasTutup(batch.tutupPo);
 }
 
 export function keTiket(katalog: Katalog, batch: Batch, sekarang: number): TiketData {
@@ -64,6 +96,7 @@ export function keTiket(katalog: Katalog, batch: Batch, sekarang: number): Tiket
     terisi: slot.terisi,
     kuota: slot.kuota,
     iata: IATA_ASAL[info.negara.kode] ?? null,
+    member: slotMember(batch.items),
   };
 }
 
@@ -99,7 +132,7 @@ export interface NegaraHero {
   estimasi: { hari: number; batchNama: string } | null;
 }
 
-export function dataHero(katalog: Katalog): NegaraHero[] {
+export function dataHero(katalog: Katalog, sekarang: number): NegaraHero[] {
   return katalog.negaraList
     .filter((n) => IATA_ASAL[n.kode])
     .map((n) => ({
@@ -107,7 +140,7 @@ export function dataHero(katalog: Katalog): NegaraHero[] {
       nama: n.nama,
       mataUang: n.mataUang,
       iata: IATA_ASAL[n.kode],
-      buka: katalog.batchList.filter((b) => b.status === "open" && negaraBatch(katalog, b) === n.kode).length,
+      buka: katalog.batchList.filter((b) => masihBuka(b, sekarang) && negaraBatch(katalog, b) === n.kode).length,
       estimasi: estimasiKirim(katalog, n.kode),
     }));
 }

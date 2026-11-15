@@ -28,6 +28,14 @@ export const KONTAK = {
   email: "pawfox0512@gmail.com",
 };
 
+// Member A2O SOUL untuk pooling photocard. Satu tempat supaya gampang diubah.
+// Slot per member dibaca dari item batch bernama "POB Photocard · <Nama>",
+// jadi tag member hanya muncul di batch yang memang punya item itu.
+// Diisi organizer: nama persis seperti yang mau ditampilkan ke buyer.
+export const A2O_SOUL_MEMBERS: string[] = [];
+
+export const AWALAN_ITEM_MEMBER = "POB Photocard · ";
+
 export type StatusTracking =
   | "open"
   | "done_checkout"

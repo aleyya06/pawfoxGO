@@ -6,7 +6,7 @@ import StripNegara, { SEMUA } from "@/components/StripNegara";
 import { KONTAK } from "@/lib/data";
 import { formatTanggal } from "@/lib/format";
 import { muatKatalog } from "@/lib/db";
-import { negaraBatch, updateTerakhir } from "@/lib/tampilan";
+import { masihBuka, negaraBatch, updateTerakhir } from "@/lib/tampilan";
 
 export const metadata: Metadata = { title: "Tracking Batch" };
 export const dynamic = "force-dynamic";
@@ -26,6 +26,7 @@ export default async function HalamanTracking({ searchParams }: { searchParams: 
   const { negara: paramNegara } = await searchParams;
   const negaraAktif = katalog.negaraList.find((n) => n.kode === paramNegara?.toUpperCase());
   const aktif = negaraAktif?.kode ?? SEMUA;
+  const sekarang = Date.now();
 
   const urut = [...katalog.batchList].sort((a, b) =>
     (updateTerakhir(b)?.tanggal ?? "").localeCompare(updateTerakhir(a)?.tanggal ?? "")
@@ -45,10 +46,7 @@ export default async function HalamanTracking({ searchParams }: { searchParams: 
     <div className="wadah halaman">
       <header className="kepala-halaman">
         <h1>Tracking Batch</h1>
-        <p className="bagian-pengantar">
-          Posisi terbaru tiap batch, yang paling baru di-update di atas. Timeline lengkap dan semua catatannya ada di
-          halaman batch masing-masing.
-        </p>
+        <p className="bagian-pengantar">Posisi terbaru tiap batch. Timeline lengkapnya ada di halaman batch.</p>
       </header>
 
       <StripNegara
@@ -79,12 +77,11 @@ export default async function HalamanTracking({ searchParams }: { searchParams: 
                 <div className="lacak-identitas">
                   <p className="tiket-negara">
                     <Bendera kode={info.negara.kode} />
-                    <span className="mono">{info.negara.kode}</span>
-                    <span>{info.komponen.nama}</span>
+                    {info.negara.nama} · {info.komponen.nama}
                   </p>
                   <h2 className="lacak-nama">{b.nama}</h2>
                 </div>
-                <RelPosisi status={b.status} />
+                <RelPosisi status={b.status} tutup={b.status === "open" && !masihBuka(b, sekarang)} />
                 <div className="lacak-update">
                   {update ? (
                     <>

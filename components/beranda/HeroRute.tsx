@@ -99,7 +99,6 @@ export default function HeroRute({ negara, awal }: { negara: NegaraHero[]; awal:
     >
       <motion.div className="waybill" style={{ rotateX, rotateY, transformPerspective: 1200 }}>
         <div className="waybill-kepala">
-          <span className="waybill-jenis">Air waybill</span>
           <span className="waybill-rute mono">
             BKK · ICN · PVG · NRT <span aria-hidden="true">→</span>
             <span className="sr-only">ke</span> {IATA_TUJUAN}

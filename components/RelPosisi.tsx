@@ -3,7 +3,7 @@ import { STATUS_TRACKING, labelStatus, urutanStatus, type StatusTracking } from 
 // Rel mini lima stop untuk daftar tracking: sekilas kelihatan batch ada di
 // tahap berapa tanpa membuka timeline lengkap. Titiknya dekoratif; teks di
 // bawahnya yang membawa informasi untuk pembaca layar.
-export default function RelPosisi({ status }: { status: StatusTracking }) {
+export default function RelPosisi({ status, tutup = false }: { status: StatusTracking; tutup?: boolean }) {
   const posisi = urutanStatus(status);
   return (
     <div className="rel-posisi">
@@ -20,7 +20,7 @@ export default function RelPosisi({ status }: { status: StatusTracking }) {
         <span className="mono">
           Tahap {posisi + 1}/{STATUS_TRACKING.length}
         </span>{" "}
-        {labelStatus(status)}
+        {status === "open" && tutup ? "Closed" : labelStatus(status)}
       </p>
     </div>
   );

@@ -1,6 +1,6 @@
 # Panduan Fase 2: Login LINE, Tagihan, dan Database
 
-> **Status 2026-10-03 malam: kode Fase 2 SUDAH DIBANGUN** (login LINE, halaman Tagihan, panel admin, halaman publik baca dari Supabase, cek pesanan server-side). Yang tersisa cuma satu: koreksi `SUPABASE_URL` di `.env.local` dengan Project URL yang persis, lalu jalankan `node --env-file=.env.local scripts/seed.mjs` untuk isi data contoh. Setelah itu login pertama pakai akun LINE-mu otomatis jadi admin.
+> **Status 2026-10-03 malam: kode Fase 2 SUDAH DIBANGUN** (login LINE, halaman Tagihan, panel admin, halaman publik baca dari Supabase, cek pesanan server-side). Yang tersisa cuma satu: koreksi `SUPABASE_URL` di `.env.local` dengan Project URL yang persis, lalu jalankan `node --env-file=.env.local scripts/seed.mjs` untuk isi katalog awal. Setelah itu login pertama pakai akun LINE-mu otomatis jadi admin.
 
 Panduan ini buat kamu jalani sendiri (sekitar 30-45 menit), karena butuh dua akun yang cuma kamu yang bisa bikin: Supabase (database) dan LINE Developers (login LINE). Setelah semua kunci ada, sisanya (kode login, halaman tagihan, panel admin) tinggal dibangunkan ke ZCode di sesi berikutnya.
 
@@ -38,7 +38,7 @@ Buka Project Settings > API. Supabase sekarang memakai format kunci baru:
 - publishable key (diawali `sb_publishable_`, boleh terlihat publik)
 - secret key (diawali `sb_secret_`, rahasia, jangan dibagikan ke siapa pun)
 
-Simpan ketiganya ke `.env.local` (contoh isinya di Langkah 5). Status 2026-10-03: kunci Supabase sudah tersimpan di `.env.local`, tinggal cocokkan Project URL-nya.
+Simpan ketiganya ke `.env.local` (format isinya di Langkah 5). Status 2026-10-03: kunci Supabase sudah tersimpan di `.env.local`, tinggal cocokkan Project URL-nya.
 
 ## Langkah 4: Bikin channel LINE Login
 

@@ -165,7 +165,7 @@ export default async function HalamanAdmin({ searchParams }: { searchParams: Pro
             </label>
             <label>
               Atau username (buyer tanpa LINE)
-              <input type="text" name="username" placeholder="contohbuyer" />
+              <input type="text" name="username" placeholder="username buyer" />
             </label>
             <label>
               4 digit terakhir WA-nya
@@ -174,7 +174,7 @@ export default async function HalamanAdmin({ searchParams }: { searchParams: Pro
           </fieldset>
           <label>
             Catatan (opsional)
-            <input type="text" name="catatan" placeholder="Contoh: bayar DP dulu" />
+            <input type="text" name="catatan" placeholder="Catatan buat buyer, misal soal DP" />
           </label>
           <button type="submit" className="tombol">
             Bikin tagihan
@@ -210,7 +210,7 @@ export default async function HalamanAdmin({ searchParams }: { searchParams: Pro
           </label>
           <label>
             Catatan
-            <input type="text" name="catatan" placeholder="Contoh: udah keluar customs" />
+            <input type="text" name="catatan" placeholder="Posisi terbaru, misal sudah keluar customs" />
           </label>
           <label>
             Tanggal

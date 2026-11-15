@@ -7,7 +7,7 @@ import BatchBuka from "@/components/beranda/BatchBuka";
 import DindingReview from "@/components/beranda/DindingReview";
 import HeroRute from "@/components/beranda/HeroRute";
 import { muatKatalog, semuaReviewTampil } from "@/lib/db";
-import { dataHero, keTiket } from "@/lib/tampilan";
+import { dataHero, keTiket, masihBuka } from "@/lib/tampilan";
 
 export const dynamic = "force-dynamic";
 
@@ -31,8 +31,8 @@ export default async function Beranda() {
   }
 
   const sekarang = Date.now();
-  const tiketBuka = katalog.batchList.filter((b) => b.status === "open").map((b) => keTiket(katalog, b, sekarang));
-  const hero = dataHero(katalog);
+  const tiketBuka = katalog.batchList.filter((b) => masihBuka(b, sekarang)).map((b) => keTiket(katalog, b, sekarang));
+  const hero = dataHero(katalog, sekarang);
   const heroAwal = hero.find((n) => n.buka > 0)?.kode ?? hero[0]?.kode ?? "TH";
   const reviews = await semuaReviewTampil();
 
@@ -41,12 +41,12 @@ export default async function Beranda() {
       <section className="wadah hero" aria-labelledby="judul-hero">
         <div className="hero-teks">
           <h1 id="judul-hero" className="hero-judul">
-            Jajan Album &amp; Merch Lintas Negara, <span className="hero-sorot">Tanpa Drama Tracking.</span>
+            Jajan Album &amp; POB A2O SOUL Lintas Negara, <span className="hero-sorot">Tanpa Drama Tracking.</span>
           </h1>
           <p className="hero-sub">
-            Group order personal untuk album, merch, dan barang resmi dari Thailand, Korea Selatan, China, dan Jepang.
-            Rate GO tiap batch dikunci dari awal, dan posisi barangmu bisa dipantau dari warehouse negara asal sampai
-            tiba di Indonesia.
+            Group order personal untuk album, POB A2O SOUL, dan photocard resmi dari Korea Selatan, China, Thailand, dan
+            Jepang. Rate GO tiap batch dikunci dari awal, dan posisi barangmu bisa dipantau dari warehouse negara asal
+            sampai tiba di Indonesia.
           </p>
           <div className="hero-aksi">
             <Link className="tombol tombol-besar" href="/po">
@@ -64,9 +64,7 @@ export default async function Beranda() {
       <section id="batch-buka" className="wadah bagian bagian-batch" aria-labelledby="judul-po-aktif">
         <div className="kepala-bagian">
           <h2 id="judul-po-aktif">Ongoing batch</h2>
-          <p className="bagian-pengantar">
-            Batch yang masih menerima order. Pilih negara buat menyaring, rate GO di tiap tiket sudah dikunci.
-          </p>
+          <p className="bagian-pengantar">Batch yang masih menerima order. Rate GO di tiap tiket sudah dikunci.</p>
         </div>
         <BatchBuka tiket={tiketBuka} negara={katalog.negaraList.map((n) => ({ kode: n.kode, nama: n.nama }))} />
       </section>
@@ -88,7 +86,7 @@ export default async function Beranda() {
           <div className="kepala-bagian">
             <h2 id="judul-kurs">Hitung cepat</h2>
             <p className="bagian-pengantar">
-              Ketik harga atau pilih contoh barang, langsung jadi rupiah. Tabel rate lengkap ada di{" "}
+              Ketik harga dalam KRW, CNY, THB, atau JPY, langsung jadi rupiah. Tabel rate lengkap ada di{" "}
               <Link href="/kalkulator">Kalkulator</Link>.
             </p>
           </div>
